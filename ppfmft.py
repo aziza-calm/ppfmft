@@ -3,10 +3,17 @@ def __init_plugin__(app):
         label='Pymol future Dock Plugin',
         command=lambda: mytkdialog(app.root))
 
+#Action for button Dock! (the only button we have)
+#runs fmft_dock.py
 def leftmouse():
-	import os
-	os.system("python /home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/fmft_dock.py /home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/1avx_l_nmin.pdb /home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/1avx_r_nmin.pdb /home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/fmft_weights_ei.txt")
-
+	import subprocess
+	srcfmft = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/fmft_dock.py"
+	lig = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/1avx_l_nmin.pdb"
+	rec = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/1avx_r_nmin.pdb"
+	wei = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/fmft_weights_ei.txt"
+	cmd = "python " + str(srcfmft) + " " + str(lig) + " " + str(rec) + " " + str(wei) 
+	subprocess.Popen(cmd, shell=True)
+	
 def mytkdialog(parent):
 	import Tkinter as tk
 	import ttk
