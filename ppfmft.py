@@ -7,12 +7,22 @@ def __init_plugin__(app):
 #runs fmft_dock.py
 def leftmouse():
 	import subprocess
+	import Tkinter
+	import tkMessageBox
 	srcfmft = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/fmft_dock.py"
 	lig = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/1avx_l_nmin.pdb"
 	rec = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/1avx_r_nmin.pdb"
 	wei = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/fmft_weights_ei.txt"
 	fmftcmd = ['python', srcfmft, lig, rec, wei] 
-	subprocess.Popen(fmftcmd)
+	p = subprocess.Popen(fmftcmd)
+	while p.returncode is None:
+		time.sleep(100)
+		tkMessageBox.showinfo("Information","Hold on a sec...or two")
+    	p.poll()
+	if p.returncode == 0:
+		tkMessageBox.showinfo("Information","Done! :)")
+	else:
+		tkMessageBox.showerror("Error","Something went wrong :(")
 	
 def mytkdialog(parent):
 	import Tkinter as tk
