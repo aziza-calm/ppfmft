@@ -18,7 +18,7 @@ def leftmouse():
 	while p.returncode is None:
 		time.sleep(100)
 		tkMessageBox.showinfo("Information","Hold on a sec...or two")
-    	p.poll()
+		p.poll()
 	if p.returncode == 0:
 		tkMessageBox.showinfo("Information","Done! :)")
 	else:
