@@ -27,6 +27,7 @@ def leftmouse():
 	
 def mytkdialog(parent):
 	import Tkinter as tk
+	#we need ttk for comboboxes
 	import ttk
 	
 	root = tk.Tk()
