@@ -15,11 +15,15 @@ def leftmouse():
 	rec = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/1avx_r_nmin.pdb"
 	wei = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/fmft_weights_ei.txt"
 	fmftcmd = ['python', srcfmft, lig, rec, wei] 
-	p = subprocess.Popen(fmftcmd)
+	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE)
 	while p.returncode is None:
-		time.sleep(100)
-		tkMessageBox.showinfo("Information","Hold on a sec...or two")
-		p.poll()
+		time.sleep(1)
+		s_out, s_err = p.communicate()
+		if s_out:
+			tkMessageBox.showinfo("Information", s_out)
+		if s_err:
+			tkMessageBox.showinfo("Warnings", s_err)
+    	p.poll()
 	if p.returncode == 0:
 		tkMessageBox.showinfo("Information","Done! :)")
 	else:
