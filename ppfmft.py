@@ -29,6 +29,9 @@ def leftmouse():
 	else:
 		tkMessageBox.showerror("Error","Something went wrong :(")
 	
+def _select_receptor(anysignofworking):
+	print anysignofworking
+	
 def mytkdialog(parent):
 	import Tkinter as tk
 	#we need ttk for comboboxes
@@ -37,11 +40,18 @@ def mytkdialog(parent):
 	root = tk.Tk()
 	root.geometry("500x200+100+80")
 	root.title("Pymol future Dock Plugin")
-	combobox1 = ttk.Combobox(root,values = [u"Desire", u"Lust"],height=3)
+	
+	receptors = ["receptor1", "receptor2"]
+	combobox1 = ttk.Combobox(root,values = receptors, height=3, state = 'readonly')
 	combobox1.set(u"Receptor")
- 	combobox1.grid(column=0,row=0)
- 	combobox2 = ttk.Combobox(root, values = [u"ONE",u"TWO",u"THREE"],height=3)
- 	combobox2.set(u"Ligand")
-	combobox2.grid(column=2,row=0)
+	combobox1.grid(column=0,row=0)
+	combobox1.bind("<<ComboboxSelected>>", lambda _ :_select_receptor(receptors[combobox1.current()]))
+	
+ 	ligands = ["ligand1", "ligand2"]
+	combobox2 = ttk.Combobox(root, values = ligands, height=3, state = 'readonly')
+	combobox2.set(u"Ligand")
+	combobox2.grid(column=1,row=0)
+	combobox2.bind("<<ComboboxSelected>>", lambda _ :_select_receptor(ligands[combobox2.current()]))
+	
  	buttonDock=tk.Button(root,text='Dock!',width=6,height=1,bg='blue',fg='white',font='arial 14', command = leftmouse)
  	buttonDock.grid(column=2,row=1)
