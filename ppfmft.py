@@ -5,14 +5,14 @@ def __init_plugin__(app):
 
 #Action for button Dock! (the only button we have)
 #runs fmft_dock.py
-def leftmouse():
+def leftmouse(rec, lig):
 	import subprocess
 	import Tkinter
 	import tkMessageBox
 	import time
 	srcfmft = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/fmft_dock.py"
-	lig = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/1avx_l_nmin.pdb"
-	rec = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/1avx_r_nmin.pdb"
+	#lig = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/1avx_l_nmin.pdb"
+	#rec = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/1avx_r_nmin.pdb"
 	wei = "/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/fmft_weights_ei.txt"
 	fmftcmd = ['python', srcfmft, lig, rec, wei] 
 	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE)
@@ -29,9 +29,6 @@ def leftmouse():
 	else:
 		tkMessageBox.showerror("Error","Something went wrong :(")
 	
-def _select_receptor(anysignofworking):
-	print anysignofworking
-	
 def mytkdialog(parent):
 	import Tkinter as tk
 	#we need ttk for comboboxes
@@ -45,13 +42,11 @@ def mytkdialog(parent):
 	combobox1 = ttk.Combobox(root,values = receptors, height=3, state = 'readonly')
 	combobox1.set(u"Receptor")
 	combobox1.grid(column=0,row=0)
-	combobox1.bind("<<ComboboxSelected>>", lambda _ :_select_receptor(receptors[combobox1.current()]))
 	
  	ligands = ["ligand1", "ligand2"]
 	combobox2 = ttk.Combobox(root, values = ligands, height=3, state = 'readonly')
 	combobox2.set(u"Ligand")
 	combobox2.grid(column=1,row=0)
-	combobox2.bind("<<ComboboxSelected>>", lambda _ :_select_receptor(ligands[combobox2.current()]))
 	
- 	buttonDock=tk.Button(root,text='Dock!',width=6,height=1,bg='blue',fg='white',font='arial 14', command = leftmouse)
+ 	buttonDock=tk.Button(root,text='Dock!',width=6,height=1,bg='blue',fg='white',font='arial 14', command = lambda: leftmouse(receptors[combobox1.current()], ligands[combobox2.current()]))
  	buttonDock.grid(column=2,row=1)
