@@ -6,8 +6,8 @@ def __init_plugin__(app):
         label='Dock Plugin',
         command=lambda: mytkdialog(app.root))
 
-#Action for button Start
-#runs fmft_dock.py
+# Action for button Start
+# runs fmft_dock.py
 def run_dock(dirname, recname, ligname):
 	import subprocess
 	import tkMessageBox
