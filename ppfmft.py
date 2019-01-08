@@ -14,6 +14,7 @@ def run_dock(dirname, recname, ligname):
 	import time
 	import shutil
 	import tempfile
+	# Creating of temporary directory where receptor and ligand will be copied in
 	tmpdir = tempfile.mkdtemp(dir = dirname)
 	rec = tmpdir + "/receptor.pdb"
 	cmd.save(rec, recname)
@@ -22,6 +23,7 @@ def run_dock(dirname, recname, ligname):
 	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
 	wei = dirname + "/install-local/bin/fmft_weights_ei.txt"
 	fmftcmd = ['python', srcfmft, lig, rec, wei] 
+	# Run!
 	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE)
 	while p.returncode is None:
 		time.sleep(1)
@@ -35,8 +37,12 @@ def run_dock(dirname, recname, ligname):
 		tkMessageBox.showinfo("Information","Done! :)")
 	else:
 		tkMessageBox.showerror("Error","Something went wrong :(")
+	# Removing temporary directory
 	shutil.rmtree(tmpdir)
 
+# Action for button Dock :3 it's a kind of surprise.
+# When you finally press the coveted button and wait for the start of the magic,
+# but instead you get an idiotic window asking you to enter the path
 def fmftpath(x, y):
 	pathw = tk.Tk()
 	pathw.title("Path")
@@ -44,18 +50,21 @@ def fmftpath(x, y):
 	fmftpath_label.grid(row=2, column=0)
 	fmftpath_entry = tk.Entry(pathw, width=50)
 	fmftpath_entry.grid(row=3, column=0)
+	# this is a default path
 	fmftpath_entry.insert(0, "/home/aziza/Downloads/basa/fmft_code_dev")
 	fmftpath_entry.bind('<Return>', run_dock)
-	buttonDock=tk.Button(pathw,text='Start',width=6,height=1,bg='blue',fg='white',font='verdana 14', command = lambda: run_dock(fmftpath_entry.get(), x, y))
-	buttonDock.grid(column=1,row=4)
+	# true button that runs docking
+	buttonStart=tk.Button(pathw,text='Start',width=6,height=1,bg='blue',fg='white',font='verdana 14', command = lambda: run_dock(fmftpath_entry.get(), x, y))
+	buttonStart.grid(column=1,row=4)
 	
+# Here is the main window where you select receptor und ligand
 def mytkdialog(parent):
 	#we need ttk for comboboxes
 	import ttk
 	
 	root = tk.Tk()
 	root.geometry("500x200+100+80")
-	root.title("Pymol future Dock Plugin")
+	root.title("Dock Plugin")
 	
 	receptors = cmd.get_names(selection='(all)')
 	combobox1 = ttk.Combobox(root,values = receptors, height=3, state = 'readonly')
@@ -69,5 +78,5 @@ def mytkdialog(parent):
 	combobox2.grid(column=1,row=0)
 	lig = ligands[combobox2.current()]
 	
- 	buttonDock=tk.Button(root,text='Dock!',width=6,height=1,bg='blue',fg='white',font='arial 14', command = lambda:  fmftpath(rec, lig))
+ 	buttonDock=tk.Button(root,text='Dock!',width=6,height=1,bg='blue',fg='white',font='arial 14', command = lambda: fmftpath(rec, lig))
  	buttonDock.grid(column=2,row=1)
