@@ -6,6 +6,12 @@ def __init_plugin__(app):
         label='Dock Plugin',
         command=lambda: mytkdialog(app.root))
 
+def read_output(pipe, funcs):
+	for line in iter(pipe.readline, b''):
+		for func in funcs:
+			func(line.decode('utf-8'))
+	pipe.close()
+
 # Action for button Start
 # runs fmft_dock.py
 def run_dock(dirname, recname, ligname):
@@ -14,6 +20,8 @@ def run_dock(dirname, recname, ligname):
 	import time
 	import shutil
 	import tempfile
+	from threading  import Thread
+	from Queue import Queue
 	# Creating of temporary directory where receptor and ligand will be copied in
 	tmpdir = tempfile.mkdtemp(dir = dirname)
 	rec = tmpdir + "/receptor.pdb"
@@ -24,19 +32,26 @@ def run_dock(dirname, recname, ligname):
 	wei = dirname + "/install-local/bin/fmft_weights_ei.txt"
 	fmftcmd = ['python', srcfmft, lig, rec, wei] 
 	# Run!
-	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE)
-	while p.returncode is None:
-		time.sleep(1)
-		s_out, s_err = p.communicate()
-		if s_out:
-			tkMessageBox.showinfo("Information", s_out)
-		if s_err:
-			tkMessageBox.showinfo("Warnings", s_err)
-    	p.poll()
-	if p.returncode == 0:
-		tkMessageBox.showinfo("Information","Done! :)")
-	else:
-		tkMessageBox.showerror("Error","Something went wrong :(")
+	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=tmpdir)
+	dockw = tk.Tk()
+	dockw.title("Docking")
+	text = tk.Text(dockw, width=90, height=70)
+	text.grid(row=0, column=0)
+	text.insert('1.0', "Docking started...")
+	outs, errs = [], []
+	q = Queue()
+	stdout_thread = Thread(target=read_output, args=(p.stdout, [q.put, outs.append]))
+	stderr_thread = Thread(target=read_output, args=(p.stderr, [q.put, errs.append]))
+	for t in (stdout_thread, stderr_thread):
+		t.daemon = True
+		t.start()
+	p.wait()
+	q.put(None)
+	outs = ' '.join(outs)
+	errs = ' '.join(errs)
+	for line in iter(q.get, None):
+		text.insert('1.0', line)
+	rc = p.returncode
 	# Removing temporary directory
 	shutil.rmtree(tmpdir)
 
