@@ -50,7 +50,9 @@ def run_dock(dirname, recname, ligname):
 	outs = ' '.join(outs)
 	errs = ' '.join(errs)
 	for line in iter(q.get, None):
-		text.insert('1.0', line)
+		import re
+		changedline = re.sub(r'\r', '\n', line)
+		text.insert('1.0', changedline)
 	rc = p.returncode
 	# Removing temporary directory
 	shutil.rmtree(tmpdir)
