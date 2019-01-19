@@ -1,5 +1,6 @@
 import Tkinter as tk
 from pymol import cmd
+import re
 
 def __init_plugin__(app):
     app.menuBar.addmenuitem('Plugin', 'command',
@@ -50,7 +51,6 @@ def run_dock(dirname, recname, ligname):
 	outs = ' '.join(outs)
 	errs = ' '.join(errs)
 	for line in iter(q.get, None):
-		import re
 		changedline = re.sub(r'\r', '\n', line)
 		text.insert('1.0', changedline)
 	rc = p.returncode
