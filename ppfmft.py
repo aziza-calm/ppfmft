@@ -60,7 +60,7 @@ def run_dock(dirname, recname, ligname):
 # Action for button Dock :3 it's a kind of surprise.
 # When you finally press the coveted button and wait for the start of the magic,
 # but instead you get an idiotic window asking you to enter the path
-def fmftpath(x, y):
+def fmftpath(rec, lig):
 	pathw = tk.Tk()
 	pathw.title("Path")
 	fmftpath_label = tk.Label(pathw, text="Specify the path to the /fmft_code_dev folder first")
@@ -71,7 +71,7 @@ def fmftpath(x, y):
 	fmftpath_entry.insert(0, "/home/aziza/Downloads/basa/fmft_code_dev")
 	fmftpath_entry.bind('<Return>', run_dock)
 	# true button that runs docking
-	buttonStart=tk.Button(pathw,text='Start',width=6,height=1,bg='blue',fg='white',font='verdana 14', command = lambda: run_dock(fmftpath_entry.get(), x, y))
+	buttonStart=tk.Button(pathw,text='Start',width=6,height=1,bg='blue',fg='white',font='verdana 14', command = lambda: run_dock(fmftpath_entry.get(), rec, lig))
 	buttonStart.grid(column=1,row=4)
 	
 # Here is the main window where you select receptor und ligand
