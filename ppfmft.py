@@ -25,22 +25,32 @@ def read_output(pipe, funcs):
 # Action for button Start
 # runs fmft_dock.py
 def run_dock(dirname, recname, ligname):
+	
 	# Creating of temporary directory where receptor and ligand will be copied in
 	tmpdir = tempfile.mkdtemp(dir = dirname)
+	
+	# Making copies of receptor and ligand into tmpdir
 	rec = tmpdir + "/receptor.pdb"
 	cmd.save(rec, recname)
 	lig = tmpdir + "/ligand.pdb"
 	cmd.save(lig, ligname)
+	
+	# Preparations for running fmft (creating of string command for Popen)
 	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
 	wei = dirname + "/install-local/bin/fmft_weights_ei.txt"
 	fmftcmd = ['python', srcfmft, lig, rec, wei] 
+	
 	# Run!
 	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=tmpdir)
+	
+	# Creating a window for dock log
 	dockw = tk.Tk()
 	dockw.title("Docking")
 	text = tk.Text(dockw, width=90, height=70)
 	text.grid(row=0, column=0)
 	text.insert('1.0', "Docking started...")
+	
+	# Catching log lines using threads and queue
 	outs, errs = [], []
 	q = Queue()
 	stdout_thread = Thread(target=read_output, args=(p.stdout, [q.put, outs.append]))
@@ -56,6 +66,7 @@ def run_dock(dirname, recname, ligname):
 		changedline = re.sub(r'\r', '\n', line)
 		text.insert('1.0', changedline)
 	rc = p.returncode
+	
 	# Removing temporary directory
 	shutil.rmtree(tmpdir)
 
@@ -63,6 +74,7 @@ def run_dock(dirname, recname, ligname):
 # When you finally press the coveted button and wait for the start of the magic,
 # but instead you get an idiotic window asking you to enter the path
 def fmftpath(rec, lig):
+	# New window
 	pathw = tk.Tk()
 	pathw.title("Path")
 	fmftpath_label = tk.Label(pathw, text="Specify the path to the /fmft_code_dev folder first")
