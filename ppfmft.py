@@ -106,7 +106,7 @@ def run_dock(dirname, recname, ligname):
 		show_result(tmpdir)
 		
 	# Removing temporary directory
-	shutil.rmtree(tmpdir)
+	#shutil.rmtree(tmpdir)
 
 # Action for button Dock :3 it's a kind of surprise.
 # When you finally press the coveted button and wait for the start of the magic,
