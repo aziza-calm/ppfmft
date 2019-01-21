@@ -1,5 +1,4 @@
 import Tkinter as tk
-#we need ttk for comboboxes
 import ttk	
 from pymol import cmd
 import re
@@ -26,7 +25,7 @@ def read_output(pipe, funcs):
 # runs fmft_dock.py
 def run_dock(dirname, recname, ligname):
 	
-	# Creating of temporary directory where receptor and ligand will be copied in
+	# Creating a temporary directory
 	tmpdir = tempfile.mkdtemp(dir = dirname)
 	
 	# Making copies of receptor and ligand into tmpdir
