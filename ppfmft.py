@@ -34,7 +34,7 @@ def run_dock(dirname, recname, ligname):
 	lig = tmpdir + "/ligand.pdb"
 	cmd.save(lig, ligname)
 	
-	# Preparations for running fmft (creating of string command for Popen)
+	# Preparations for running fmft (creating a string command for Popen)
 	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
 	wei = dirname + "/install-local/bin/fmft_weights_ei.txt"
 	fmftcmd = ['python', srcfmft, lig, rec, wei] 
