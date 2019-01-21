@@ -35,7 +35,7 @@ def get_angle(rm):
 
 # Results of docking
 # Kinda movie: ligand jumps around receptor
-def show_result(tmpdir):
+def show_result(tmpdir, ligname):
 	n = 10 # number of positions of ligand
 	ft_file = tmpdir + "/ft.000.0.0"
 	rm_file = tmpdir + "/rm.000.0.0"
@@ -44,12 +44,12 @@ def show_result(tmpdir):
 	for i in range(n):
 		num_state = i + 1
 		name_copy = "copy_ligand_" + str(i)
-		cmd.copy(name_copy, "ligand")
+		cmd.copy(name_copy, ligname)
 		tv = ft_data[i, 1:4]
 		rm = rm_data[i].reshape((3, 3))
 		en = ft_data[i, 4]
 		cmd.translate(list(tv), name_copy)
-		cmd.rotate(list(get_axis(rm)), get_angle(rm), "copy_ligand")
+		cmd.rotate(list(get_axis(rm)), get_angle(rm), name_copy)
 		cmd.create("result", name_copy, 0, num_state)
 		cmd.delete(name_copy)
 	result = tmpdir + "/result_dock.pdb"
@@ -103,7 +103,7 @@ def run_dock(dirname, recname, ligname):
 	
 	# When the process is terminated, show results
 	if rc is not None:
-		show_result(tmpdir)
+		show_result(tmpdir, ligname)
 		
 	# Removing temporary directory
 	#shutil.rmtree(tmpdir)
