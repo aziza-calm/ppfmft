@@ -102,8 +102,8 @@ def run_dock(dirname, recname, ligname):
 	rc = p.returncode
 	
 	# When the process is terminated, show results
-	#if rc is not None:
-		#show_result(tmpdir)
+	if rc is not None:
+		show_result(tmpdir)
 		
 	# Removing temporary directory
 	shutil.rmtree(tmpdir)
