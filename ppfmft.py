@@ -1,6 +1,15 @@
 import Tkinter as tk
+#we need ttk for comboboxes
+import ttk	
 from pymol import cmd
 import re
+import subprocess
+import tkMessageBox
+import time
+import shutil
+import tempfile
+from threading  import Thread
+from Queue import Queue
 
 def __init_plugin__(app):
     app.menuBar.addmenuitem('Plugin', 'command',
@@ -16,13 +25,6 @@ def read_output(pipe, funcs):
 # Action for button Start
 # runs fmft_dock.py
 def run_dock(dirname, recname, ligname):
-	import subprocess
-	import tkMessageBox
-	import time
-	import shutil
-	import tempfile
-	from threading  import Thread
-	from Queue import Queue
 	# Creating of temporary directory where receptor and ligand will be copied in
 	tmpdir = tempfile.mkdtemp(dir = dirname)
 	rec = tmpdir + "/receptor.pdb"
@@ -76,8 +78,6 @@ def fmftpath(rec, lig):
 	
 # Here is the main window where you select receptor und ligand
 def mytkdialog(parent):
-	#we need ttk for comboboxes
-	import ttk
 	
 	root = tk.Tk()
 	root.geometry("500x200+100+80")
