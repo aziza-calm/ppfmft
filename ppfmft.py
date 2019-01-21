@@ -9,6 +9,7 @@ import shutil
 import tempfile
 from threading  import Thread
 from Queue import Queue
+import numpy as np
 
 def __init_plugin__(app):
     app.menuBar.addmenuitem('Plugin', 'command',
@@ -20,6 +21,40 @@ def read_output(pipe, funcs):
 		for func in funcs:
 			func(line.decode('utf-8'))
 	pipe.close()
+	
+# Getting an axis from rotation matrix. We need it to use cmd.rotate
+def get_axis(rm):
+	eig_values, eig_vectors = np.linalg.eig(rm)
+	v_d = np.abs(eig_values - 1)
+	idx = np.argmin(v_d)
+	return np.float64(eig_vectors[:, idx])
+
+# Getting an angle from rotation matrix
+def get_angle(rm):
+	return np.arccos(0.5*(np.trace(rm)-1))
+
+# Results of docking
+# Kinda movie: ligand jumps around receptor
+def show_result(tmpdir):
+	n = 10 # number of positions of ligand
+	ft_file = tmpdir + "/ft.000.0.0"
+	rm_file = tmpdir + "/rm.000.0.0"
+	ft_data = np.loadtxt(ft_file)
+	rm_data = np.loadtxt(rm_file)
+	for i in range(n):
+		num_state = i + 1
+		name_copy = "copy_ligand_" + str(i)
+		cmd.copy(name_copy, "ligand")
+		tv = ft_data[i, 1:4]
+		rm = rm_data[i].reshape((3, 3))
+		en = ft_data[i, 4]
+		cmd.translate(list(tv), name_copy)
+		cmd.rotate(list(get_axis(rm)), get_angle(rm), "copy_ligand")
+		cmd.create("result", name_copy, 0, num_state)
+		cmd.delete(name_copy)
+	result = tmpdir + "/result_dock.pdb"
+	cmd.save(result, "result")
+	cmd.mplay()
 
 # Action for button Start
 # runs fmft_dock.py
@@ -66,6 +101,10 @@ def run_dock(dirname, recname, ligname):
 		text.insert('1.0', changedline)
 	rc = p.returncode
 	
+	# When the process is terminated, show results
+	#if rc is not None:
+		#show_result(tmpdir)
+		
 	# Removing temporary directory
 	shutil.rmtree(tmpdir)
 
