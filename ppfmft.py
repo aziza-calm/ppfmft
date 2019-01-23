@@ -124,21 +124,23 @@ def fmftpath(rec, lig):
 	pathw = tk.Tk()
 	pathw.title("Path")
 	fmftpath = tk.StringVar()
-	fmftpath_label = tk.Label(pathw, text="Specify the path to the /fmft_code_dev folder first")
-	fmftpath_label.grid(row=2, column=0)
+	fmftpath_label1 = tk.Label(pathw, text="Specify the path to the /fmft_code_dev folder first")
+	fmftpath_label2 = tk.Label(pathw, text="Example:/home/aziza/Downloads/basa/fmft_code_dev")
+	fmftpath_label1.grid(row=2, column=0)
+	fmftpath_label2.grid(row=3, column=0)
 	fmftpath_entry = tk.Entry(pathw, width=45, textvariable=fmftpath)
-	fmftpath_entry.grid(row=3, column=0)
+	fmftpath_entry.grid(row=4, column=0)
 	# this is a default path
 	user_path = os.path.expanduser("~")
 	fmftpath_entry.insert(0, user_path)
 	
 	buttonChoose = tk.Button(pathw, text='Choose', command = lambda: choose_folder(fmftpath, fmftpath_entry))
-	buttonChoose.grid(column=1, row=3)
+	buttonChoose.grid(column=1, row=4)
 	
 	fmftpath_entry.bind('<Return>', run_dock)
 	# true button that runs docking
 	buttonStart=tk.Button(pathw,text='Start',width=6,height=1,bg='blue',fg='white',font='verdana 14', command = lambda: run_dock(fmftpath_entry.get(), rec, lig))
-	buttonStart.grid(column=1,row=4)
+	buttonStart.grid(column=1,row=5)
 	
 # Here is the main window where you select receptor und ligand
 def mytkdialog(parent):
