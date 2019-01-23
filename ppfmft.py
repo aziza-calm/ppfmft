@@ -10,6 +10,7 @@ import tempfile
 from threading  import Thread
 from Queue import Queue
 import numpy as np
+import os
 
 def __init_plugin__(app):
     app.menuBar.addmenuitem('Plugin', 'command',
@@ -35,7 +36,7 @@ def get_angle(rm):
 
 # Results of docking
 # Kinda movie: ligand jumps around receptor
-def show_result(tmpdir):
+def show_result(tmpdir, ligname):
 	n = 10 # number of positions of ligand
 	ft_file = tmpdir + "/ft.000.0.0"
 	rm_file = tmpdir + "/rm.000.0.0"
@@ -44,12 +45,12 @@ def show_result(tmpdir):
 	for i in range(n):
 		num_state = i + 1
 		name_copy = "copy_ligand_" + str(i)
-		cmd.copy(name_copy, "ligand")
+		cmd.copy(name_copy, ligname)
 		tv = ft_data[i, 1:4]
 		rm = rm_data[i].reshape((3, 3))
 		en = ft_data[i, 4]
 		cmd.translate(list(tv), name_copy)
-		cmd.rotate(list(get_axis(rm)), get_angle(rm), "copy_ligand")
+		cmd.rotate(list(get_axis(rm)), get_angle(rm), name_copy)
 		cmd.create("result", name_copy, 0, num_state)
 		cmd.delete(name_copy)
 	result = tmpdir + "/result_dock.pdb"
@@ -102,11 +103,17 @@ def run_dock(dirname, recname, ligname):
 	rc = p.returncode
 	
 	# When the process is terminated, show results
-	#if rc is not None:
-		#show_result(tmpdir)
+	if rc is not None:
+		show_result(tmpdir, ligname)
 		
 	# Removing temporary directory
-	shutil.rmtree(tmpdir)
+	#shutil.rmtree(tmpdir)
+	
+def choose_folder(s, fmftpath_entry):
+	import Tkconstants, tkFileDialog
+	s = tkFileDialog.askdirectory()
+	fmftpath_entry.delete(0, tk.END)
+	fmftpath_entry.insert(0, s)
 
 # Action for button Dock :3 it's a kind of surprise.
 # When you finally press the coveted button and wait for the start of the magic,
@@ -115,12 +122,18 @@ def fmftpath(rec, lig):
 	# New window
 	pathw = tk.Tk()
 	pathw.title("Path")
+	fmftpath = tk.StringVar()
 	fmftpath_label = tk.Label(pathw, text="Specify the path to the /fmft_code_dev folder first")
 	fmftpath_label.grid(row=2, column=0)
-	fmftpath_entry = tk.Entry(pathw, width=50)
+	fmftpath_entry = tk.Entry(pathw, width=45, textvariable=fmftpath)
 	fmftpath_entry.grid(row=3, column=0)
 	# this is a default path
-	fmftpath_entry.insert(0, "/home/aziza/Downloads/basa/fmft_code_dev")
+	user_path = os.path.expanduser("~")
+	fmftpath_entry.insert(0, user_path)
+	
+	buttonChoose = tk.Button(pathw, text='Choose', command = lambda: choose_folder(fmftpath, fmftpath_entry))
+	buttonChoose.grid(column=1, row=3)
+	
 	fmftpath_entry.bind('<Return>', run_dock)
 	# true button that runs docking
 	buttonStart=tk.Button(pathw,text='Start',width=6,height=1,bg='blue',fg='white',font='verdana 14', command = lambda: run_dock(fmftpath_entry.get(), rec, lig))
