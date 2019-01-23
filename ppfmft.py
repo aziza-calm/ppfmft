@@ -10,6 +10,8 @@ import tempfile
 from threading  import Thread
 from Queue import Queue
 import numpy as np
+import os
+import tkFileDialog
 
 def __init_plugin__(app):
     app.menuBar.addmenuitem('Plugin', 'command',
@@ -107,6 +109,12 @@ def run_dock(dirname, recname, ligname):
 		
 	# Removing temporary directory
 	#shutil.rmtree(tmpdir)
+	
+def choose_folder(s, fmftpath_entry):
+	import Tkconstants, tkFileDialog
+	s = tkFileDialog.askdirectory()
+	fmftpath_entry.delete(0, tk.END)
+	fmftpath_entry.insert(0, s)
 
 # Action for button Dock :3 it's a kind of surprise.
 # When you finally press the coveted button and wait for the start of the magic,
@@ -115,12 +123,18 @@ def fmftpath(rec, lig):
 	# New window
 	pathw = tk.Tk()
 	pathw.title("Path")
+	fmftpath = tk.StringVar()
 	fmftpath_label = tk.Label(pathw, text="Specify the path to the /fmft_code_dev folder first")
 	fmftpath_label.grid(row=2, column=0)
-	fmftpath_entry = tk.Entry(pathw, width=50)
+	fmftpath_entry = tk.Entry(pathw, width=45, textvariable=fmftpath)
 	fmftpath_entry.grid(row=3, column=0)
 	# this is a default path
-	fmftpath_entry.insert(0, "/home/aziza/Downloads/basa/fmft_code_dev")
+	user_path = os.path.expanduser("~")
+	fmftpath_entry.insert(0, user_path)
+	
+	buttonChoose = tk.Button(pathw, text='Choose', command = lambda: choose_folder(fmftpath, fmftpath_entry))
+	buttonChoose.grid(column=1, row=3)
+	
 	fmftpath_entry.bind('<Return>', run_dock)
 	# true button that runs docking
 	buttonStart=tk.Button(pathw,text='Start',width=6,height=1,bg='blue',fg='white',font='verdana 14', command = lambda: run_dock(fmftpath_entry.get(), rec, lig))
