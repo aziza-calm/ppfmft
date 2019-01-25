@@ -148,6 +148,7 @@ def mytkdialog(parent):
 	root = tk.Tk()
 	root.geometry("500x200+100+80")
 	root.title("Dock Plugin")
+	root.iconbitmap('@/home/aziza/idea.xbm')
 	
 	receptors = cmd.get_names(selection='(all)')
 	combobox1 = ttk.Combobox(root,values = receptors, height=3, state = 'readonly')
