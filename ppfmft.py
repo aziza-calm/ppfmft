@@ -8,7 +8,7 @@ import time
 import shutil
 import tempfile
 from threading  import Thread
-from Queue import Queue
+from Queue import Queue, Empty
 import numpy as np
 import os
 import tkFileDialog
@@ -97,13 +97,18 @@ def run_dock(dirname, recname, ligname):
 	for t in (stdout_thread, stderr_thread):
 		t.daemon = True
 		t.start()
-	p.wait()
-	q.put(None)
-	outs = ' '.join(outs)
-	errs = ' '.join(errs)
-	for line in iter(q.get, None):
-		changedline = re.sub(r'\r', '\n', line)
-		text.insert('1.0', changedline)
+
+        while p.poll() is None:  # While our process is running
+		time.sleep(0.01)
+		while True:  # Read all elements currently in Queue
+			try:
+				line = q.get_nowait()
+				changedline = re.sub(r'\r', '\n', line)
+				text.insert('1.0', changedline)
+			except Empty:
+				break
+		dockw.update()  # Tell GUI to update so it does not freeze
+
 	rc = p.returncode
 	
 	# When the process is terminated, show results
