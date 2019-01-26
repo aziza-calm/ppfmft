@@ -73,7 +73,7 @@ def run_dock(dirname, recname, ligname):
 	
 	# Preparations for running fmft (creating a string command for Popen)
 	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
-	wei = dirname + "/install-local/bin/fmft_weights_ei.txt"
+	wei = dirname + "/install-local/bin/prms/fmft_weights_ei.txt"
 	fmftcmd = ['python', srcfmft, lig, rec, wei] 
 	
 	# Run!
