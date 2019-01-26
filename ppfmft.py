@@ -84,7 +84,7 @@ def run_dock(dirname, recname, ligname):
 	
 	# Creating a window for dock log
 	dockw = tk.Tk()
-	dockw.title("Docking")
+	dockw.title("FMFT: running...")
 	text = tk.Text(dockw, width=90, height=70)
 	text.grid(row=0, column=0)
 	text.insert('1.0', "Docking started...")
@@ -110,6 +110,8 @@ def run_dock(dirname, recname, ligname):
 		dockw.update()  # Tell GUI to update so it does not freeze
 
 	rc = p.returncode
+	if rc == 0: dockw.title("FMFT: finished")
+	else: dockw.title("FMFT: failed")
 	
 	# When the process is terminated, show results
 	if rc is not None:
