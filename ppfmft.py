@@ -13,17 +13,20 @@ import numpy as np
 import os
 import tkFileDialog
 
+
 def __init_plugin__(app):
     app.menuBar.addmenuitem('Plugin', 'command',
         label='Dock Plugin',
         command=lambda: mytkdialog(app.root))
+
 
 def read_output(pipe, funcs):
 	for line in iter(pipe.readline, b''):
 		for func in funcs:
 			func(line.decode('utf-8'))
 	pipe.close()
-	
+
+
 # Getting an axis from rotation matrix. We need it to use cmd.rotate
 def get_axis(rm):
 	eig_values, eig_vectors = np.linalg.eig(rm)
@@ -31,9 +34,11 @@ def get_axis(rm):
 	idx = np.argmin(v_d)
 	return np.float64(eig_vectors[:, idx])
 
+
 # Getting an angle from rotation matrix
 def get_angle(rm):
 	return np.arccos(0.5*(np.trace(rm)-1))
+
 
 # Results of docking
 # Kinda movie: ligand jumps around receptor
@@ -54,14 +59,12 @@ def show_result(tmpdir, ligname):
 		cmd.rotate(list(get_axis(rm)), get_angle(rm), name_copy)
 		cmd.create("result", name_copy, 0, num_state)
 		cmd.delete(name_copy)
-	result = tmpdir + "/result_dock.pdb"
-	cmd.save(result, "result")
 	cmd.mplay()
+
 
 # Action for button Start
 # runs fmft_dock.py
 def run_dock(dirname, recname, ligname):
-	
 	# Creating a temporary directory
 	tmpdir = tempfile.mkdtemp()
 	
@@ -109,12 +112,14 @@ def run_dock(dirname, recname, ligname):
 		
 	# Removing temporary directory
 	#shutil.rmtree(tmpdir)
-	
+
+
 def choose_folder(s, fmftpath_entry):
 	import Tkconstants, tkFileDialog
 	s = tkFileDialog.askdirectory()
 	fmftpath_entry.delete(0, tk.END)
 	fmftpath_entry.insert(0, s)
+
 
 # Action for button Dock :3 it's a kind of surprise.
 # When you finally press the coveted button and wait for the start of the magic,
@@ -134,33 +139,35 @@ def fmftpath(rec, lig):
 	user_path = os.path.expanduser("~")
 	fmftpath_entry.insert(0, user_path)
 	
-	buttonChoose = tk.Button(pathw, text='Choose', command = lambda: choose_folder(fmftpath, fmftpath_entry))
+	buttonChoose = tk.Button(pathw, text='Choose', command=lambda: choose_folder(fmftpath, fmftpath_entry))
 	buttonChoose.grid(column=1, row=4)
 	
 	fmftpath_entry.bind('<Return>', run_dock)
 	# true button that runs docking
-	buttonStart=tk.Button(pathw,text='Start',width=6,height=1,bg='blue',fg='white',font='verdana 14', command = lambda: run_dock(fmftpath_entry.get(), rec, lig))
-	buttonStart.grid(column=1,row=5)
-	
+	buttonStart=tk.Button(pathw, text='Start', width=6, height=1, bg='blue', fg='white', font='verdana 14',
+			      command=lambda: run_dock(fmftpath_entry.get(), rec, lig))
+	buttonStart.grid(column=1, row=5)
+
+
 # Here is the main window where you select receptor und ligand
 def mytkdialog(parent):
-	
 	root = tk.Tk()
 	root.geometry("500x200+100+80")
 	root.title("Dock Plugin")
 	root.iconbitmap('@idea.xbm')
 	
 	receptors = cmd.get_names(selection='(all)')
-	combobox1 = ttk.Combobox(root,values = receptors, height=3, state = 'readonly')
+	combobox1 = ttk.Combobox(root, values=receptors, height=3, state='readonly')
 	combobox1.set(u"Receptor")
-	combobox1.grid(column=0,row=0)
+	combobox1.grid(column=0, row=0)
 	rec = receptors[combobox1.current()]
 	
  	ligands = cmd.get_names(selection='(all)')
-	combobox2 = ttk.Combobox(root, values = ligands, height=3, state = 'readonly')
+	combobox2 = ttk.Combobox(root, values=ligands, height=3, state='readonly')
 	combobox2.set(u"Ligand")
-	combobox2.grid(column=1,row=0)
+	combobox2.grid(column=1, row=0)
 	lig = ligands[combobox2.current()]
 	
- 	buttonDock=tk.Button(root,text='Dock!',width=6,height=1,bg='blue',fg='white',font='arial 14', command = lambda: fmftpath(rec, lig))
- 	buttonDock.grid(column=2,row=1)
+ 	buttonDock=tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14',
+			     command=lambda: fmftpath(rec, lig))
+ 	buttonDock.grid(column=2, row=1)
