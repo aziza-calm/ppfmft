@@ -63,7 +63,7 @@ def show_result(tmpdir, ligname):
 def run_dock(dirname, recname, ligname):
 	
 	# Creating a temporary directory
-	tmpdir = tempfile.mkdtemp(dir = dirname)
+	tmpdir = tempfile.mkdtemp()
 	
 	# Making copies of receptor and ligand into tmpdir
 	rec = tmpdir + "/receptor.pdb"
