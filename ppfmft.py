@@ -122,7 +122,6 @@ def run_dock(dirname, recname, ligname):
 
 
 def choose_folder(s, fmftpath_entry):
-	import Tkconstants, tkFileDialog
 	s = tkFileDialog.askdirectory()
 	fmftpath_entry.delete(0, tk.END)
 	fmftpath_entry.insert(0, s)
