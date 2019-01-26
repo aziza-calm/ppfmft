@@ -144,8 +144,8 @@ def fmftpath(rec, lig):
 	
 	fmftpath_entry.bind('<Return>', run_dock)
 	# true button that runs docking
-	buttonStart=tk.Button(pathw, text='Start', width=6, height=1, bg='blue', fg='white', font='verdana 14',
-			      command=lambda: run_dock(fmftpath_entry.get(), rec, lig))
+	buttonStart = tk.Button(pathw, text='Start', width=6, height=1, bg='blue', fg='white', font='verdana 14',
+			        command=lambda: run_dock(fmftpath_entry.get(), rec, lig))
 	buttonStart.grid(column=1, row=5)
 
 
@@ -168,6 +168,6 @@ def mytkdialog(parent):
 	combobox2.grid(column=1, row=0)
 	lig = ligands[combobox2.current()]
 	
- 	buttonDock=tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14',
-			     command=lambda: fmftpath(rec, lig))
+ 	buttonDock = tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14',
+			       command=lambda: fmftpath(rec, lig))
  	buttonDock.grid(column=2, row=1)
