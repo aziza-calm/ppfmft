@@ -45,8 +45,12 @@ def show_result(tmpdir, ligname):
 	n = 10 # number of positions of ligand
 	ft_file = tmpdir + "/ft.000.0.0"
 	rm_file = tmpdir + "/rm.000.0.0"
-	ft_data = np.loadtxt(ft_file)
-	rm_data = np.loadtxt(rm_file)
+	try:
+		ft_data = np.loadtxt(ft_file)
+		rm_data = np.loadtxt(rm_file)
+	except IOError:
+		tkMessageBox.showinfo("Warning!", "Unable to load ft_file, rm_file.\nCheck the path you entered and try again")
+		return 1
 	for i in range(n):
 		num_state = i + 1
 		name_copy = "copy_ligand_" + str(i)
@@ -59,6 +63,7 @@ def show_result(tmpdir, ligname):
 		cmd.create("result", name_copy, 0, num_state)
 		cmd.delete(name_copy)
 	cmd.mplay()
+	
 
 
 # Action for button Start
@@ -121,7 +126,6 @@ def run_dock(dirname, recname, ligname):
 
 
 def choose_folder(s, fmftpath_entry):
-	import Tkconstants, tkFileDialog
 	s = tkFileDialog.askdirectory()
 	fmftpath_entry.delete(0, tk.END)
 	fmftpath_entry.insert(0, s)
