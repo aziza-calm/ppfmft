@@ -63,7 +63,6 @@ def show_result(tmpdir, ligname):
 		cmd.create("result", name_copy, 0, num_state)
 		cmd.delete(name_copy)
 	cmd.mplay()
-	
 
 
 # Action for button Start
@@ -75,13 +74,15 @@ def run_dock(dirname, recname, ligname):
 	# Making copies of receptor and ligand into tmpdir
 	rec = tmpdir + "/receptor.pdb"
 	cmd.save(rec, recname)
+	print "Receptor is " + recname
 	lig = tmpdir + "/ligand.pdb"
 	cmd.save(lig, ligname)
+	print "Ligand is " + ligname
 	
 	# Preparations for running fmft (creating a string command for Popen)
 	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
 	wei = dirname + "/install-local/bin/prms/fmft_weights_ei.txt"
-	fmftcmd = ['python', srcfmft, lig, rec, wei] 
+	fmftcmd = ['python', srcfmft, lig, rec, wei]
 	
 	# Run!
 	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=tmpdir)
@@ -91,7 +92,7 @@ def run_dock(dirname, recname, ligname):
 	dockw.title("FMFT: running...")
 	text = tk.Text(dockw, width=90, height=70)
 	text.grid(row=0, column=0)
-	text.insert('1.0', "Docking started...")
+	text.insert('1.0', "Started" + str(fmftcmd) + "\n")
 	
 	# Catching log lines using threads and queue
 	outs, errs = [], []
@@ -108,21 +109,28 @@ def run_dock(dirname, recname, ligname):
 			try:
 				line = q.get_nowait()
 				changedline = re.sub(r'\r', '\n', line)
-				text.insert('1.0', changedline)
+				text.insert('end', changedline)
 			except Empty:
 				break
-		dockw.update()  # Tell GUI to update so it does not freeze
+		try:
+			dockw.update()  # Tell GUI to update so it does not freeze
+		except tk.TclError:
+			tkMessageBox.showinfo("Warning", "You won't be able to see the log :(")
+			break
 
 	rc = p.returncode
-	if rc == 0: dockw.title("FMFT: finished")
-	else: dockw.title("FMFT: failed")
+	try:
+		if rc == 0: dockw.title("FMFT: finished")
+		else: dockw.title("FMFT: failed")
+	except tk.TclError:
+		pass
 	
 	# When the process is terminated, show results
 	if rc is not None:
 		show_result(tmpdir, ligname)
 		
 	# Removing temporary directory
-	#shutil.rmtree(tmpdir)
+	shutil.rmtree(tmpdir)
 
 
 def choose_folder(s, fmftpath_entry):
@@ -171,17 +179,23 @@ def mytkdialog(parent):
 		print "Some problems with icon, but still works"
 	
 	receptors = cmd.get_names(selection='(all)')
-	combobox1 = ttk.Combobox(root, values=receptors, height=3, state='readonly')
-	combobox1.set(u"Receptor")
-	combobox1.grid(column=0, row=0)
-	rec = receptors[combobox1.current()]
+	comboboxRec = ttk.Combobox(root, values=receptors, height=3, state='readonly')
+	comboboxRec.set(u"Receptor")
+	comboboxRec.grid(column=0, row=0)
+	rec = receptors[comboboxRec.current()]
 	
  	ligands = cmd.get_names(selection='(all)')
-	combobox2 = ttk.Combobox(root, values=ligands, height=3, state='readonly')
-	combobox2.set(u"Ligand")
-	combobox2.grid(column=1, row=0)
-	lig = ligands[combobox2.current()]
+	comboboxLig = ttk.Combobox(root, values=ligands, height=3, state='readonly')
+	comboboxLig.set(u"Ligand")
+	comboboxLig.grid(column=1, row=0)
+	lig = ligands[comboboxLig.current()]
 	
- 	buttonDock = tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14',
-			       command=lambda: fmftpath(rec, lig))
+ 	buttonDock = tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14')
+	if comboboxRec.current() == -1:
+		tkMessageBox.showinfo("Warning", "No receptor selected!")
+		return
+	if comboboxLig.current() == -1:
+		tkMessageBox.showinfo("Warning", "No ligand selected!")
+		return
+	buttonDock.config(command=lambda: fmftpath(rec, lig))
  	buttonDock.grid(column=2, row=1)
