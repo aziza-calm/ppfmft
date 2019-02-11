@@ -49,7 +49,7 @@ def show_result(tmpdir, ligname):
 		ft_data = np.loadtxt(ft_file)
 		rm_data = np.loadtxt(rm_file)
 	except IOError:
-		tkMessageBox.showinfo("Warning!", "Unable to load ft_file, rm_file.\nCheck the path you entered and try again")
+		tkMessageBox.showinfo("Warning!", "Unable to load ft_file, rm_file.\nCheck if the path is correct or if there is enough space")
 		return 1
 	for i in range(n):
 		num_state = i + 1
