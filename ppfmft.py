@@ -1,6 +1,7 @@
 import Tkinter as tk
 import ttk	
 from pymol import cmd
+import pymol
 import re
 import subprocess
 import tkMessageBox
@@ -137,6 +138,7 @@ def choose_folder(s, fmftpath_entry):
 	s = tkFileDialog.askdirectory()
 	fmftpath_entry.delete(0, tk.END)
 	fmftpath_entry.insert(0, s)
+	pymol.plugins.pref_set("FMFT_PATH", s)
 
 
 # Action for button Dock :3 it's a kind of surprise.
@@ -156,7 +158,8 @@ def fmftpath(rec, lig):
 	fmftpath_entry.grid(row=4, column=0)
 	# this is a default path
 	user_path = os.path.expanduser("~")
-	fmftpath_entry.insert(0, user_path)
+	fmftpath = pymol.plugins.pref_get("FMFT_PATH", d=user_path)
+	fmftpath_entry.insert(0, fmftpath)
 	
 	buttonChoose = tk.Button(pathw, text='Choose', command=lambda: choose_folder(fmftpath, fmftpath_entry))
 	buttonChoose.grid(column=1, row=4)
@@ -178,6 +181,11 @@ def mytkdialog(parent):
 	except tk.TclError:
 		print "Some problems with icon, but still works"
 	
+	name1 = "molecule 1"
+	cmd.load("1b8h.cif", name1)
+	cmd.load("/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/1avx_r_nmin.pdb")
+	cmd.load("/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/1avx_l_nmin.pdb")
+
 	receptors = cmd.get_names(selection='(all)')
 	comboboxRec = ttk.Combobox(root, values=receptors, height=3, state='readonly')
 	comboboxRec.set(u"Receptor")
@@ -191,11 +199,5 @@ def mytkdialog(parent):
 	lig = ligands[comboboxLig.current()]
 	
  	buttonDock = tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14')
-	if comboboxRec.current() == -1:
-		tkMessageBox.showinfo("Warning", "No receptor selected!")
-		return
-	if comboboxLig.current() == -1:
-		tkMessageBox.showinfo("Warning", "No ligand selected!")
-		return
 	buttonDock.config(command=lambda: fmftpath(rec, lig))
  	buttonDock.grid(column=2, row=1)
