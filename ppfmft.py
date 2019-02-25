@@ -75,10 +75,8 @@ def run_dock(dirname, recname, ligname):
 	# Making copies of receptor and ligand into tmpdir
 	rec = tmpdir + "/receptor.pdb"
 	cmd.save(rec, recname)
-	print "Receptor is " + recname
 	lig = tmpdir + "/ligand.pdb"
 	cmd.save(lig, ligname)
-	print "Ligand is " + ligname
 	
 	# Preparations for running fmft (creating a string command for Popen)
 	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
@@ -93,7 +91,7 @@ def run_dock(dirname, recname, ligname):
 	dockw.title("FMFT: running...")
 	text = tk.Text(dockw, width=90, height=70)
 	text.grid(row=0, column=0)
-	text.insert('1.0', "Started" + str(fmftcmd) + "\n")
+	text.insert('1.0', "Started docking\nReceptor is " + recname + "\nLigand is " + ligname + "\n")
 	
 	# Catching log lines using threads and queue
 	outs, errs = [], []
@@ -170,6 +168,9 @@ def fmftpath(rec, lig):
 			        command=lambda: run_dock(fmftpath_entry.get(), rec, lig))
 	buttonStart.grid(column=1, row=5)
 
+	
+def choose():
+	print "Receptor was chosen"
 
 # Here is the main window where you select receptor und ligand
 def mytkdialog(parent):
@@ -181,23 +182,15 @@ def mytkdialog(parent):
 	except tk.TclError:
 		print "Some problems with icon, but still works"
 	
-	name1 = "molecule 1"
-	cmd.load("1b8h.cif", name1)
-	cmd.load("/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/1avx_r_nmin.pdb")
-	cmd.load("/home/aziza/Downloads/basa/fmft_code_dev/install-local/bin/1avx_l_nmin.pdb")
-
-	receptors = cmd.get_names(selection='(all)')
-	comboboxRec = ttk.Combobox(root, values=receptors, height=3, state='readonly')
+	selections = cmd.get_names(selection='(all)')
+	
+	comboboxRec = ttk.Combobox(root, values=selections, height=3, state='readonly')
 	comboboxRec.set(u"Receptor")
 	comboboxRec.grid(column=0, row=0)
-	rec = receptors[comboboxRec.current()]
 	
- 	ligands = cmd.get_names(selection='(all)')
-	comboboxLig = ttk.Combobox(root, values=ligands, height=3, state='readonly')
+	comboboxLig = ttk.Combobox(root, values=selections, height=3, state='readonly')
 	comboboxLig.set(u"Ligand")
 	comboboxLig.grid(column=1, row=0)
-	lig = ligands[comboboxLig.current()]
 	
- 	buttonDock = tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14')
-	buttonDock.config(command=lambda: fmftpath(rec, lig))
+ 	buttonDock = tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14', command=lambda: fmftpath(comboboxRec.get(), comboboxLig.get()))
  	buttonDock.grid(column=2, row=1)
