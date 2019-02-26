@@ -168,9 +168,6 @@ def fmftpath(rec, lig):
 			        command=lambda: run_dock(fmftpath_entry.get(), rec, lig))
 	buttonStart.grid(column=1, row=5)
 
-	
-def choose():
-	print "Receptor was chosen"
 
 # Here is the main window where you select receptor und ligand
 def mytkdialog(parent):
@@ -192,5 +189,6 @@ def mytkdialog(parent):
 	comboboxLig.set(u"Ligand")
 	comboboxLig.grid(column=1, row=0)
 	
- 	buttonDock = tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14', command=lambda: fmftpath(comboboxRec.get(), comboboxLig.get()))
+ 	buttonDock = tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14',
+						   command=lambda: fmftpath(comboboxRec.get(), comboboxLig.get()))
  	buttonDock.grid(column=2, row=1)
