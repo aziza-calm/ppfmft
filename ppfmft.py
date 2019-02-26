@@ -69,17 +69,6 @@ def show_result(tmpdir, ligname):
 # Action for button Start
 # runs fmft_dock.py
 def run_dock(dirname, recname, ligname):
-	# Checking if receptor or ligand were somehow removed
-	if rec in cmd.get_names(selection='(all)'):
-		pass
-	else:
-		tkMessageBox.showinfo("Warning", "Selected receptor doesn't exist anymore :c")
-		return 1
-	if lig in cmd.get_names(selection='(all)'):
-		pass
-	else:
-		tkMessageBox.showinfo("Warning", "Selected ligand doesn't exist anymore :c")
-		return 1
 	# Creating a temporary directory
 	tmpdir = tempfile.mkdtemp()
 	
@@ -190,6 +179,11 @@ def fmftpath(rec, lig):
 			        command=lambda: run_dock(fmftpath_entry.get(), rec, lig))
 	buttonStart.grid(column=1, row=5)
 
+	
+def update_selection(comboboxRec, comboboxLig):
+	comboboxRec['values'] = cmd.get_names(selection='(all)')
+	comboboxLig['values'] = cmd.get_names(selection='(all)')
+
 
 # Here is the main window where you select receptor und ligand
 def mytkdialog(parent):
@@ -210,6 +204,9 @@ def mytkdialog(parent):
 	comboboxLig = ttk.Combobox(root, values=selections, height=3, state='readonly')
 	comboboxLig.set(u"Ligand")
 	comboboxLig.grid(column=1, row=0)
+	
+	buttonUpd = tk.Button(root, text='Update list', height=1, command=lambda: update_selection(comboboxRec, comboboxLig));
+	buttonUpd.grid(column=2, row=0);
 	
  	buttonDock = tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14',
 						   command=lambda: fmftpath(comboboxRec.get(), comboboxLig.get()))
