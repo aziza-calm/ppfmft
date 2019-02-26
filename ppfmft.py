@@ -69,6 +69,18 @@ def show_result(tmpdir, ligname):
 # Action for button Start
 # runs fmft_dock.py
 def run_dock(dirname, recname, ligname):
+	# Checking if receptor or ligand were somehow removed
+	if recname in cmd.get_names(selection='(all)'):
+		pass
+	else:
+		tkMessageBox.showinfo("Warning", "Selected receptor doesn't exist anymore :c")
+		return 1
+	if ligname in cmd.get_names(selection='(all)'):
+		pass
+	else:
+		tkMessageBox.showinfo("Warning", "Selected ligand doesn't exist anymore :c")
+		return 1
+	
 	# Creating a temporary directory
 	tmpdir = tempfile.mkdtemp()
 	
