@@ -16,7 +16,7 @@ import tkFileDialog
 
 def __init_plugin__(app):
     app.menuBar.addmenuitem('Plugin', 'command',
-        label='Dock Plugin',
+        label='Dock them all',
         command=lambda: mytkdialog(app.root))
 
 
@@ -69,6 +69,17 @@ def show_result(tmpdir, ligname):
 # Action for button Start
 # runs fmft_dock.py
 def run_dock(dirname, recname, ligname):
+	# Checking if receptor or ligand were somehow removed
+	if rec in cmd.get_names(selection='(all)'):
+		pass
+	else:
+		tkMessageBox.showinfo("Warning", "Selected receptor doesn't exist anymore :c")
+		return 1
+	if lig in cmd.get_names(selection='(all)'):
+		pass
+	else:
+		tkMessageBox.showinfo("Warning", "Selected ligand doesn't exist anymore :c")
+		return 1
 	# Creating a temporary directory
 	tmpdir = tempfile.mkdtemp()
 	
@@ -143,6 +154,17 @@ def choose_folder(s, fmftpath_entry):
 # When you finally press the coveted button and wait for the start of the magic,
 # but instead you get an idiotic window asking you to enter the path
 def fmftpath(rec, lig):
+	# Checking if receptor or ligand were somehow removed
+	if rec in cmd.get_names(selection='(all)'):
+		pass
+	else:
+		tkMessageBox.showinfo("Warning", "Selected receptor doesn't exist anymore :c")
+		return 1
+	if lig in cmd.get_names(selection='(all)'):
+		pass
+	else:
+		tkMessageBox.showinfo("Warning", "Selected ligand doesn't exist anymore :c")
+		return 1
 	# New window
 	pathw = tk.Tk()
 	pathw.title("Path")
