@@ -70,14 +70,10 @@ def show_result(tmpdir, ligname):
 # runs fmft_dock.py
 def run_dock(dirname, recname, ligname):
 	# Checking if receptor or ligand were somehow removed
-	if recname in cmd.get_names(selection='(all)'):
-		pass
-	else:
+	if not recname in cmd.get_names(selection='(all)'):
 		tkMessageBox.showinfo("Warning", "Selected receptor doesn't exist anymore :c")
 		return 1
-	if ligname in cmd.get_names(selection='(all)'):
-		pass
-	else:
+	if not ligname in cmd.get_names(selection='(all)'):
 		tkMessageBox.showinfo("Warning", "Selected ligand doesn't exist anymore :c")
 		return 1
 	
@@ -156,14 +152,10 @@ def choose_folder(s, fmftpath_entry):
 # but instead you get an idiotic window asking you to enter the path
 def fmftpath(rec, lig):
 	# Checking if receptor or ligand were somehow removed
-	if rec in cmd.get_names(selection='(all)'):
-		pass
-	else:
+	if not rec in cmd.get_names(selection='(all)'):
 		tkMessageBox.showinfo("Warning", "Selected receptor doesn't exist anymore :c")
 		return 1
-	if lig in cmd.get_names(selection='(all)'):
-		pass
-	else:
+	if not lig in cmd.get_names(selection='(all)'):
 		tkMessageBox.showinfo("Warning", "Selected ligand doesn't exist anymore :c")
 		return 1
 	# New window
