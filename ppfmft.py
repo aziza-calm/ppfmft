@@ -65,6 +65,17 @@ def show_result(tmpdir, ligname):
 		cmd.delete(name_copy)
 	cmd.mplay()
 
+def pdb_prep(mol, out_prefix, tmpdir):
+	#charmm_prm = "~/prms/charmm/charmm_param.prm"
+	#charmm_rtf = "~/prms/charmm/charmm_param.rtf"
+	
+	sblu = ['/home/aziza/miniconda3/bin/sblu', 'pdb', 'prep', mol, '--no-minimize', '--out-prefix', out_prefix]
+	p = subprocess.Popen(sblu, cwd=tmpdir)
+	while p.poll() is None:  # While our process is running
+		time.sleep(0.01)
+	if p.returncode is not None:
+		return tmpdir + "/" + out_prefix + ".pdb"
+
 
 # Action for button Start
 # runs fmft_dock.py
@@ -83,13 +94,15 @@ def run_dock(dirname, recname, ligname):
 	# Making copies of receptor and ligand into tmpdir
 	rec = tmpdir + "/receptor.pdb"
 	cmd.save(rec, recname)
+	rec_prep = pdb_prep(rec, "rec_prep", tmpdir)
 	lig = tmpdir + "/ligand.pdb"
 	cmd.save(lig, ligname)
+	lig_prep = pdb_prep(lig, "lig_prep", tmpdir)
 	
 	# Preparations for running fmft (creating a string command for Popen)
 	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
 	wei = dirname + "/install-local/bin/prms/fmft_weights_ei.txt"
-	fmftcmd = ['python', srcfmft, lig, rec, wei]
+	fmftcmd = ['python', srcfmft, lig_prep, rec_prep, wei]
 	
 	# Run!
 	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=tmpdir)
@@ -99,7 +112,7 @@ def run_dock(dirname, recname, ligname):
 	dockw.title("FMFT: running...")
 	text = tk.Text(dockw, width=90, height=70)
 	text.grid(row=0, column=0)
-	text.insert('1.0', "Started docking\nReceptor is " + recname + "\nLigand is " + ligname + "\n")
+	text.insert('1.0', "Started docking\nReceptor is {}\nLigand is {}\n".format(recname, ligname))
 	
 	# Catching log lines using threads and queue
 	outs, errs = [], []
@@ -182,12 +195,15 @@ def fmftpath(rec, lig):
 	buttonStart = tk.Button(pathw, text='Start', width=6, height=1, bg='blue', fg='white', font='verdana 14',
 			        command=lambda: run_dock(fmftpath_entry.get(), rec, lig))
 	buttonStart.grid(column=1, row=5)
-
+	
 	
 def update_selection(comboboxRec, comboboxLig):
 	comboboxRec['values'] = cmd.get_names(selection='(all)')
 	comboboxLig['values'] = cmd.get_names(selection='(all)')
 
+	
+def close_window(win):
+	win.destroy()
 
 # Here is the main window where you select receptor und ligand
 def mytkdialog(parent):
