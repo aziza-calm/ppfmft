@@ -65,6 +65,8 @@ def show_result(tmpdir, ligname):
 		cmd.delete(name_copy)
 	cmd.mplay()
 
+	
+# Preprocessing
 def pdb_prep(mol, out_prefix, tmpdir):
 	#charmm_prm = "~/prms/charmm/charmm_param.prm"
 	#charmm_rtf = "~/prms/charmm/charmm_param.rtf"
