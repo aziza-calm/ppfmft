@@ -66,6 +66,7 @@ def show_result(tmpdir, ligname):
 	cmd.mplay()
 
 
+# Preprocessing
 def pdb_prep(mol, out_prefix, tmpdir):
 	#charmm_prm = "~/prms/charmm/charmm_param.prm"
 	#charmm_rtf = "~/prms/charmm/charmm_param.rtf"
@@ -215,7 +216,7 @@ def settings():
 	# this is a default path
 	fmftpath_entry.insert(0, fmftpath)
 	buttonChoose = tk.Button(sett, text='Change', command=lambda: choose_folder(fmftpath, fmftpath_entry))
-	buttonChoose.grid(column=1, row=0)
+	buttonChoose.grid(column=1, row=2)
 	fmftpath_entry.bind('<Return>', run_dock)
 
 
@@ -248,4 +249,3 @@ def mytkdialog(parent):
 	
 	buttonSet = tk.Button(root, text='Settings', height=1, command=lambda: settings())
 	buttonSet.grid(column=1, row=1)
- 
