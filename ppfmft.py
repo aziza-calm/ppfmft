@@ -115,6 +115,20 @@ def fmft_path():
 	fmftpath = pymol.plugins.pref_get("FMFT_PATH", d=user_path)
 	return fmftpath
 
+def sblu_path():
+	user_path = os.path.expanduser("~")
+	sblupath = pymol.plugins.pref_get("SBLU_PATH", d=user_path)
+	return sblupath
+
+def not_fmftpath(dirname):
+	if dirname.find("fmft_code_dev") != (len(dirname) - 13) or dirname == os.path.expanduser("~"):
+		return 1
+	else:
+		return 0
+
+def need_preprocessing():
+	return
+
 
 # runs fmft_dock.py
 def run_dock(recname, ligname):
@@ -126,8 +140,8 @@ def run_dock(recname, ligname):
 		tkMessageBox.showinfo("Warning", "Selected ligand doesn't exist anymore :c")
 		return 1
 	dirname = fmft_path()
-	if dirname.find("fmft_code_dev") != (len(dirname) - 13) or dirname == os.path.expanduser("~"):
-		print "Invalid path"
+	if not_fmftpath(dirname):
+		print "Invalid FMFT path"
 		tkMessageBox.showinfo("Invalid FMFT path", "Something wrong with FMFT path. Please, specify it in settings.")
 		return 2
 		
@@ -215,9 +229,26 @@ def settings():
 	fmftpath_entry.grid(row=2, column=0)
 	# this is a default path
 	fmftpath_entry.insert(0, fmftpath)
-	buttonChoose = tk.Button(sett, text='Change', command=lambda: choose_folder(fmftpath, fmftpath_entry))
-	buttonChoose.grid(column=1, row=2)
+	buttonChooseFmft = tk.Button(sett, text='Change', command=lambda: choose_folder(fmftpath, fmftpath_entry))
+	buttonChooseFmft.grid(column=1, row=2)
 	fmftpath_entry.bind('<Return>', run_dock)
+	
+	needprep_r = tk.BooleanVar()
+	needprep_r.set(0)
+	prep_r = tk.Checkbutton(sett, text="Preprocess receptor", variable=needprep_r, onvalue=1, offvalue=0)
+	prep_r.grid(row=3, column=0)
+	needprep_l = tk.BooleanVar()
+	needprep_l.set(0)
+	prep_l = tk.Checkbutton(sett, text="Preprocess ligand", variable=needprep_l, onvalue=1, offvalue=0)
+	prep_l.grid(row=4, column=0)
+	sblu_label = tk.Label(sett, text="Specify the path to /sblu")
+	sblu_label.grid(row=5, column=0)
+	sblupath = sblu_path()
+	sblupath_entry = tk.Entry(sett, width=45, textvariable=sblupath)
+	sblupath_entry.grid(row=6, column=0)
+	sblupath_entry.insert(0, sblupath)
+	buttonChooseSblu = tk.Button(sett, text='Change', command=lambda: choose_folder(sblupath, sblupath_entry))
+	buttonChooseSblu.grid(row=6, column=1)
 
 
 # Here is the main window where you select receptor und ligand
