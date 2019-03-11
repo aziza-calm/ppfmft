@@ -78,6 +78,9 @@ def pdb_prep(mol, out_prefix, tmpdir):
 	if p.returncode is not None:
 		return tmpdir + "/" + out_prefix + ".pdb"
 
+def save_prep(key, s):
+	pymol.plugins.pref_set(key, s)
+	print "saved prep {} {}".format(key, s)
 
 def choose_folder(s, path_entry, key):
 	s = tkFileDialog.askdirectory()
@@ -128,8 +131,10 @@ def not_fmftpath(dirname):
 
 def need_preprocessing(key):
 	if bool(pymol.plugins.pref_get(key, d=False)):
+		print  bool(pymol.plugins.pref_get(key, d=False))
 		return 1
 	else:
+		print  bool(pymol.plugins.pref_get(key, d=False))
 		return 0
 
 
@@ -148,7 +153,6 @@ def run_dock(recname, ligname):
 		tkMessageBox.showinfo("Invalid FMFT path", "Something wrong with FMFT path. Please, specify it in settings.")
 		return 2
 		
-		
 	# Creating a window for dock log
 	dockw = tk.Tk()
 	dockw.title("FMFT: running...")
@@ -164,11 +168,13 @@ def run_dock(recname, ligname):
 	rec = tmpdir + "/receptor.pdb"
 	cmd.save(rec, recname)
 	if need_preprocessing("REC_PREP"):
+		print need_preprocessing("REC_PREP")
 		rec = pdb_prep(rec, "rec_prep", tmpdir)
 		text.insert('end', "Receptor preprocessed\n")
 	lig = tmpdir + "/ligand.pdb"
 	cmd.save(lig, ligname)
 	if need_preprocessing("LIG_PREP"):
+		print need_preprocessing("LIG_PREP")
 		lig = pdb_prep(lig, "lig_prep", tmpdir)
 		text.insert('end', "Ligand preprocessed\n")
 	
@@ -242,15 +248,14 @@ def settings():
 	fmftpath_entry.bind('<Return>', run_dock)
 	
 	needprep_r = tk.BooleanVar()
-	needprep_r.set(0)
-	prep_r = tk.Checkbutton(sett, text="Preprocess receptor", variable=needprep_r, onvalue=1, offvalue=0)
+	prep_r = tk.Checkbutton(sett, text="Preprocess receptor", variable=needprep_r, onvalue=True, offvalue=False,
+							command=lambda: save_prep("REC_PREP", bool(needprep_r)))
 	prep_r.grid(row=3, column=0)
-	pymol.plugins.pref_set("REC_PREP", bool(needprep_r))
+	
 	needprep_l = tk.BooleanVar()
-	needprep_l.set(0)
-	prep_l = tk.Checkbutton(sett, text="Preprocess ligand", variable=needprep_l, onvalue=1, offvalue=0)
+	prep_l = tk.Checkbutton(sett, text="Preprocess ligand", variable=needprep_l, command=lambda: save_prep("LIG_PREP", bool(needprep_l)))
 	prep_l.grid(row=4, column=0)
-	pymol.plugins.pref_set("LIG_PREP", bool(needprep_l))
+	
 	sblu_label = tk.Label(sett, text="Specify the path to /sblu")
 	sblu_label.grid(row=5, column=0)
 	sblupath = sblu_path()
