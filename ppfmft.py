@@ -70,8 +70,8 @@ def show_result(tmpdir, ligname):
 def pdb_prep(mol, out_prefix, tmpdir):
 	#charmm_prm = "~/prms/charmm/charmm_param.prm"
 	#charmm_rtf = "~/prms/charmm/charmm_param.rtf"
-	
-	sblu = ['/home/aziza/miniconda3/bin/sblu', 'pdb', 'prep', mol, '--no-minimize', '--out-prefix', out_prefix]
+	sblupath = sblu_path()
+	sblu = [sblupath, 'pdb', 'prep', mol, '--no-minimize', '--out-prefix', out_prefix]
 	p = subprocess.Popen(sblu, cwd=tmpdir)
 	while p.poll() is None:  # While our process is running
 		time.sleep(0.01)
@@ -79,11 +79,11 @@ def pdb_prep(mol, out_prefix, tmpdir):
 		return tmpdir + "/" + out_prefix + ".pdb"
 
 
-def choose_folder(s, fmftpath_entry):
+def choose_folder(s, path_entry, key):
 	s = tkFileDialog.askdirectory()
-	fmftpath_entry.delete(0, tk.END)
-	fmftpath_entry.insert(0, s)
-	pymol.plugins.pref_set("FMFT_PATH", s)
+	path_entry.delete(0, tk.END)
+	path_entry.insert(0, s)
+	pymol.plugins.pref_set(key, s)
 
 
 # an idiotic window asking you to enter the path
@@ -104,7 +104,7 @@ def _fmftpath():
 	fmftpath = pymol.plugins.pref_get("FMFT_PATH", d=user_path)
 	fmftpath_entry.insert(0, fmftpath)
 	
-	buttonChoose = tk.Button(pathw, text='Choose', command=lambda: choose_folder(fmftpath, fmftpath_entry))
+	buttonChoose = tk.Button(pathw, text='Choose', command=lambda: choose_folder(fmftpath, fmftpath_entry, "FMFT_PATH"))
 	buttonChoose.grid(column=1, row=4)
 	
 	return fmftpath
@@ -126,8 +126,11 @@ def not_fmftpath(dirname):
 	else:
 		return 0
 
-def need_preprocessing():
-	return
+def need_preprocessing(key):
+	if bool(pymol.plugins.pref_get(key, d=False)):
+		return 1
+	else:
+		return 0
 
 
 # runs fmft_dock.py
@@ -145,25 +148,7 @@ def run_dock(recname, ligname):
 		tkMessageBox.showinfo("Invalid FMFT path", "Something wrong with FMFT path. Please, specify it in settings.")
 		return 2
 		
-	# Creating a temporary directory
-	tmpdir = tempfile.mkdtemp()
-	
-	# Making copies of receptor and ligand into tmpdir
-	rec = tmpdir + "/receptor.pdb"
-	cmd.save(rec, recname)
-	rec_prep = pdb_prep(rec, "rec_prep", tmpdir)
-	lig = tmpdir + "/ligand.pdb"
-	cmd.save(lig, ligname)
-	lig_prep = pdb_prep(lig, "lig_prep", tmpdir)
-	
-	# Preparations for running fmft (creating a string command for Popen)
-	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
-	wei = dirname + "/install-local/bin/prms/fmft_weights_ei.txt"
-	fmftcmd = ['python', srcfmft, lig_prep, rec_prep, wei]
-	
-	# Run!
-	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=tmpdir)
-	
+		
 	# Creating a window for dock log
 	dockw = tk.Tk()
 	dockw.title("FMFT: running...")
@@ -171,6 +156,29 @@ def run_dock(recname, ligname):
 	text.grid(row=0, column=0)
 	text.insert('1.0', "Started docking\nReceptor is {}\nLigand is {}\n".format(recname, ligname))
 	text.insert('end', "FMFT path is {}\n".format(dirname))
+
+	# Creating a temporary directory
+	tmpdir = tempfile.mkdtemp()
+	
+	# Making copies of receptor and ligand into tmpdir
+	rec = tmpdir + "/receptor.pdb"
+	cmd.save(rec, recname)
+	if need_preprocessing("REC_PREP"):
+		rec = pdb_prep(rec, "rec_prep", tmpdir)
+		text.insert('end', "Receptor preprocessed\n")
+	lig = tmpdir + "/ligand.pdb"
+	cmd.save(lig, ligname)
+	if need_preprocessing("LIG_PREP"):
+		lig = pdb_prep(lig, "lig_prep", tmpdir)
+		text.insert('end', "Ligand preprocessed\n")
+	
+	# Preparations for running fmft (creating a string command for Popen)
+	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
+	wei = dirname + "/install-local/bin/prms/fmft_weights_ei.txt"
+	fmftcmd = ['python', srcfmft, lig, rec, wei]
+	
+	# Run!
+	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=tmpdir)
 	
 	# Catching log lines using threads and queue
 	outs, errs = [], []
@@ -229,7 +237,7 @@ def settings():
 	fmftpath_entry.grid(row=2, column=0)
 	# this is a default path
 	fmftpath_entry.insert(0, fmftpath)
-	buttonChooseFmft = tk.Button(sett, text='Change', command=lambda: choose_folder(fmftpath, fmftpath_entry))
+	buttonChooseFmft = tk.Button(sett, text='Change', command=lambda: choose_folder(fmftpath, fmftpath_entry, "FMFT_PATH"))
 	buttonChooseFmft.grid(column=1, row=2)
 	fmftpath_entry.bind('<Return>', run_dock)
 	
@@ -237,17 +245,19 @@ def settings():
 	needprep_r.set(0)
 	prep_r = tk.Checkbutton(sett, text="Preprocess receptor", variable=needprep_r, onvalue=1, offvalue=0)
 	prep_r.grid(row=3, column=0)
+	pymol.plugins.pref_set("REC_PREP", bool(needprep_r))
 	needprep_l = tk.BooleanVar()
 	needprep_l.set(0)
 	prep_l = tk.Checkbutton(sett, text="Preprocess ligand", variable=needprep_l, onvalue=1, offvalue=0)
 	prep_l.grid(row=4, column=0)
+	pymol.plugins.pref_set("LIG_PREP", bool(needprep_l))
 	sblu_label = tk.Label(sett, text="Specify the path to /sblu")
 	sblu_label.grid(row=5, column=0)
 	sblupath = sblu_path()
 	sblupath_entry = tk.Entry(sett, width=45, textvariable=sblupath)
 	sblupath_entry.grid(row=6, column=0)
 	sblupath_entry.insert(0, sblupath)
-	buttonChooseSblu = tk.Button(sett, text='Change', command=lambda: choose_folder(sblupath, sblupath_entry))
+	buttonChooseSblu = tk.Button(sett, text='Change', command=lambda: choose_folder(sblupath, sblupath_entry, "SBLU_PATH"))
 	buttonChooseSblu.grid(row=6, column=1)
 
 
