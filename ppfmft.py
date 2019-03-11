@@ -78,10 +78,14 @@ def pdb_prep(mol, out_prefix, tmpdir):
 	if p.returncode is not None:
 		return tmpdir + "/" + out_prefix + ".pdb"
 
+
+# Saving in config whether preprocessing is needed
 def save_prep(key, s):
 	pymol.plugins.pref_set(key, s)
 	print "saved prep {} {}".format(key, s)
 
+
+# Auxiliary function for ui-choosing of folder
 def choose_folder(s, path_entry, key):
 	s = tkFileDialog.askdirectory()
 	path_entry.delete(0, tk.END)
@@ -113,21 +117,28 @@ def _fmftpath():
 	return fmftpath
 
 
+# Getting fmft path from config file
 def fmft_path():
 	user_path = os.path.expanduser("~")
 	fmftpath = pymol.plugins.pref_get("FMFT_PATH", d=user_path)
 	return fmftpath
 
+
+# Getting sblu path from config file
 def sblu_path():
 	user_path = os.path.expanduser("~")
 	sblupath = pymol.plugins.pref_get("SBLU_PATH", d=user_path)
 	return sblupath
 
+
+# Checking if fmft path is valid.
+# It should end with fmft_code_dev and shouldn't be equal to home path (that is default)
 def not_fmftpath(dirname):
 	if dirname.find("fmft_code_dev") != (len(dirname) - 13) or dirname == os.path.expanduser("~"):
 		return 1
 	else:
 		return 0
+
 
 def need_preprocessing(key):
 	if bool(pymol.plugins.pref_get(key, d=False)):
@@ -167,12 +178,14 @@ def run_dock(recname, ligname):
 	# Making copies of receptor and ligand into tmpdir
 	rec = tmpdir + "/receptor.pdb"
 	cmd.save(rec, recname)
+	# Preprocess receptor if needed
 	if need_preprocessing("REC_PREP"):
 		print need_preprocessing("REC_PREP")
 		rec = pdb_prep(rec, "rec_prep", tmpdir)
 		text.insert('end', "Receptor preprocessed\n")
 	lig = tmpdir + "/ligand.pdb"
 	cmd.save(lig, ligname)
+	# Preprocess ligand if needed
 	if need_preprocessing("LIG_PREP"):
 		print need_preprocessing("LIG_PREP")
 		lig = pdb_prep(lig, "lig_prep", tmpdir)
@@ -234,12 +247,13 @@ def settings():
 	sett = tk.Tk()
 	sett.title("Settings")
 	
+	# FMFT path
 	fmftpath = fmft_path()
-	fmftpath_label1 = tk.Label(sett, text="Specify the path to the /fmft_code_dev folder first")
+	fmftpath_label1 = tk.Label(sett, text="Specify the path to the /fmft_code_dev")
 	fmftpath_label2 = tk.Label(sett, text="Example:/home/aziza/Downloads/basa/fmft_code_dev")
 	fmftpath_label1.grid(row=0, column=0)
 	fmftpath_label2.grid(row=1, column=0)
-	fmftpath_entry = tk.Entry(sett, width=45, textvariable=fmftpath)
+	fmftpath_entry = tk.Entry(sett, width=40, textvariable=fmftpath)
 	fmftpath_entry.grid(row=2, column=0)
 	# this is a default path
 	fmftpath_entry.insert(0, fmftpath)
@@ -247,19 +261,24 @@ def settings():
 	buttonChooseFmft.grid(column=1, row=2)
 	fmftpath_entry.bind('<Return>', run_dock)
 	
+	# Checkbutton that makes preprocessing of receptor optional
+	# For now it doesn't handle its duty, needprep_r doesn't toggle between onvalue and offvalue, it stays true
 	needprep_r = tk.BooleanVar()
 	prep_r = tk.Checkbutton(sett, text="Preprocess receptor", variable=needprep_r, onvalue=True, offvalue=False,
 							command=lambda: save_prep("REC_PREP", bool(needprep_r)))
 	prep_r.grid(row=3, column=0)
 	
+	# Checkbutton that makes preprocessing of ligand optional
+	# the same problem
 	needprep_l = tk.BooleanVar()
 	prep_l = tk.Checkbutton(sett, text="Preprocess ligand", variable=needprep_l, command=lambda: save_prep("LIG_PREP", bool(needprep_l)))
 	prep_l.grid(row=4, column=0)
 	
+	# sblu path
 	sblu_label = tk.Label(sett, text="Specify the path to /sblu")
 	sblu_label.grid(row=5, column=0)
 	sblupath = sblu_path()
-	sblupath_entry = tk.Entry(sett, width=45, textvariable=sblupath)
+	sblupath_entry = tk.Entry(sett, width=40, textvariable=sblupath)
 	sblupath_entry.grid(row=6, column=0)
 	sblupath_entry.insert(0, sblupath)
 	buttonChooseSblu = tk.Button(sett, text='Change', command=lambda: choose_folder(sblupath, sblupath_entry, "SBLU_PATH"))
