@@ -1,3 +1,6 @@
+#/home/aziza/Downloads/basa/pymol/ppfmft/ppfmft.py
+#/home/aziza/miniconda3/bin/sblu
+
 import Tkinter as tk
 import ttk	
 from pymol import cmd
@@ -71,7 +74,12 @@ def pdb_prep(mol, out_prefix, tmpdir):
 	#charmm_prm = "~/prms/charmm/charmm_param.prm"
 	#charmm_rtf = "~/prms/charmm/charmm_param.rtf"
 	sblupath = sblu_path()
+	if str(sblupath).find("sblu") != (len(sblupath) - 4) or sblupath == os.path.expanduser("~"):
+		print sblupath
+		tkMessageBox.showinfo("Wrong path", "SBLU path is invalid")
+		return
 	sblu = [sblupath, 'pdb', 'prep', mol, '--no-minimize', '--out-prefix', out_prefix]
+	print "Preprocessing started"
 	p = subprocess.Popen(sblu, cwd=tmpdir)
 	while p.poll() is None:  # While our process is running
 		time.sleep(0.01)
@@ -243,6 +251,10 @@ def update_selection(comboboxRec, comboboxLig):
 	comboboxLig['values'] = cmd.get_names(selection='(all)')
 
 
+def arsch(x):
+	print "Archloch!" + str(x)
+	return -1*x
+
 def settings():
 	sett = tk.Tk()
 	sett.title("Settings")
@@ -261,19 +273,11 @@ def settings():
 	buttonChooseFmft.grid(column=1, row=2)
 	fmftpath_entry.bind('<Return>', run_dock)
 	
-	# Checkbutton that makes preprocessing of receptor optional
-	# For now it doesn't handle its duty, needprep_r doesn't toggle between onvalue and offvalue, it stays true
-	needprep_r = tk.BooleanVar()
-	prep_r = tk.Checkbutton(sett, text="Preprocess receptor", variable=needprep_r, onvalue=True, offvalue=False,
-							command=lambda: save_prep("REC_PREP", bool(needprep_r)))
-	prep_r.grid(row=3, column=0)
-	
-	# Checkbutton that makes preprocessing of ligand optional
-	# the same problem
-	needprep_l = tk.BooleanVar()
-	prep_l = tk.Checkbutton(sett, text="Preprocess ligand", variable=needprep_l, command=lambda: save_prep("LIG_PREP", bool(needprep_l)))
-	prep_l.grid(row=4, column=0)
-	
+	variants = ['only ligand', 'only receptor', 'ligand and receptor', 'no preprocess']
+	prepr_label = tk.Label(sett, text = "Make preprocess for").grid(column=0, row=3)
+	prepr_com = ttk.Combobox(sett, values = variants, state='readonly').grid(column=0, row=4)
+	#prepr_com.bind('<<ComboboxSelected>>', save_prep)
+	bSave = tk.Button(sett, text='Save', command=lambda: save_prep("PREPROCESS", prepr_com.get())).grid(column=1, row=4)
 	# sblu path
 	sblu_label = tk.Label(sett, text="Specify the path to /sblu")
 	sblu_label.grid(row=5, column=0)
