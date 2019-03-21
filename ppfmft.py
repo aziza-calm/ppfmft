@@ -275,9 +275,11 @@ def settings():
 	
 	variants = ['only ligand', 'only receptor', 'ligand and receptor', 'no preprocess']
 	prepr_label = tk.Label(sett, text = "Make preprocess for").grid(column=0, row=3)
-	prepr_com = ttk.Combobox(sett, values = variants, state='readonly').grid(column=0, row=4)
+	prepr_com = ttk.Combobox(sett, values = variants, state='readonly')
+	prepr_com.grid(column=0, row=4)
 	#prepr_com.bind('<<ComboboxSelected>>', save_prep)
-	bSave = tk.Button(sett, text='Save', command=lambda: save_prep("PREPROCESS", prepr_com.get())).grid(column=1, row=4)
+	bSave = tk.Button(sett, text='Save', command=lambda: save_prep("PREPROCESS", prepr_com.get()))
+	bSave.grid(column=1, row=4)
 	# sblu path
 	sblu_label = tk.Label(sett, text="Specify the path to /sblu")
 	sblu_label.grid(row=5, column=0)
