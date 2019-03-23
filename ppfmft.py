@@ -90,7 +90,6 @@ def pdb_prep(mol, out_prefix, tmpdir):
 # Saving in config whether preprocessing is needed
 def save_prep(key, s):
 	pymol.plugins.pref_set(key, s)
-	print "saved prep {} {}".format(key, s)
 
 
 # Auxiliary function for ui-choosing of folder
@@ -148,12 +147,11 @@ def not_fmftpath(dirname):
 		return 0
 
 
-def need_preprocessing(key):
-	if bool(pymol.plugins.pref_get(key, d=False)):
-		print  bool(pymol.plugins.pref_get(key, d=False))
+def need_preprocessing(key, mol):
+	if mol in str(pymol.plugins.pref_get(key)):
 		return 1
 	else:
-		print  bool(pymol.plugins.pref_get(key, d=False))
+		print mol + " without preprocess"
 		return 0
 
 
@@ -187,15 +185,13 @@ def run_dock(recname, ligname):
 	rec = tmpdir + "/receptor.pdb"
 	cmd.save(rec, recname)
 	# Preprocess receptor if needed
-	if need_preprocessing("REC_PREP"):
-		print need_preprocessing("REC_PREP")
+	if need_preprocessing("PREPROCESS", "receptor"):
 		rec = pdb_prep(rec, "rec_prep", tmpdir)
 		text.insert('end', "Receptor preprocessed\n")
 	lig = tmpdir + "/ligand.pdb"
 	cmd.save(lig, ligname)
 	# Preprocess ligand if needed
-	if need_preprocessing("LIG_PREP"):
-		print need_preprocessing("LIG_PREP")
+	if need_preprocessing("PREPROCESS", "ligand"):
 		lig = pdb_prep(lig, "lig_prep", tmpdir)
 		text.insert('end', "Ligand preprocessed\n")
 	
@@ -280,6 +276,7 @@ def settings():
 	#prepr_com.bind('<<ComboboxSelected>>', save_prep)
 	bSave = tk.Button(sett, text='Save', command=lambda: save_prep("PREPROCESS", prepr_com.get()))
 	bSave.grid(column=1, row=4)
+	
 	# sblu path
 	sblu_label = tk.Label(sett, text="Specify the path to /sblu")
 	sblu_label.grid(row=5, column=0)
