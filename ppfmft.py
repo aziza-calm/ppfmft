@@ -94,10 +94,12 @@ def save_prep(key, s):
 
 # Auxiliary function for ui-choosing of folder
 def choose_folder(s, path_entry, key):
+	path_entry['state'] = 'normal'
 	s = tkFileDialog.askdirectory()
 	path_entry.delete(0, tk.END)
 	path_entry.insert(0, s)
 	pymol.plugins.pref_set(key, s)
+	path_entry['state'] = 'readonly'
 
 
 # an idiotic window asking you to enter the path
@@ -273,6 +275,7 @@ def settings():
 	fmftpath_entry.grid(row=2, column=0)
 	# this is a default path
 	fmftpath_entry.insert(0, fmftpath)
+	fmftpath_entry['state'] = 'readonly'
 	buttonChooseFmft = tk.Button(sett, text='Change', command=lambda: choose_folder(fmftpath, fmftpath_entry, "FMFT_PATH"))
 	buttonChooseFmft.grid(column=1, row=2)
 	fmftpath_entry.bind('<Return>', run_dock)
@@ -293,6 +296,7 @@ def settings():
 	sblupath_entry = tk.Entry(sett, width=40, textvariable=sblupath)
 	sblupath_entry.grid(row=6, column=0)
 	sblupath_entry.insert(0, sblupath)
+	sblupath_entry['state'] = 'readonly'
 	buttonChooseSblu = tk.Button(sett, text='Change', command=lambda: choose_folder(sblupath, sblupath_entry, "SBLU_PATH"))
 	buttonChooseSblu.grid(row=6, column=1)
 
