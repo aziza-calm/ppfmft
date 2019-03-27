@@ -140,8 +140,8 @@ def sblu_path():
 
 # Checking if fmft path is valid.
 # It should end with fmft_code_dev and shouldn't be equal to home path (that is default)
-def not_fmftpath(dirname):
-	if dirname.find("fmft_code_dev") != (len(dirname) - 13) or dirname == os.path.expanduser("~"):
+def not_fmftpath(fmftpath):
+	if os.path.basename(fmftpath) != 'fmft_code_dev' or not os.path.isdir(fmftpath):
 		return 1
 	else:
 		return 0
