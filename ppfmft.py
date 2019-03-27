@@ -169,6 +169,10 @@ def run_dock(recname, ligname):
 		print "Invalid FMFT path"
 		tkMessageBox.showinfo("Invalid FMFT path", "Something wrong with FMFT path. Please, specify it in settings.")
 		return 2
+	
+	if not os.path.isfile(dirname + '/install-local/bin/fmft_dock.py'):
+		tkMessageBox.showinfo("FMFT", "Maybe you forgot to run ./bootstrap.sh?")
+		return 3
 		
 	# Creating a window for dock log
 	dockw = tk.Tk()
