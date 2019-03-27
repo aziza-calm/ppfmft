@@ -74,10 +74,10 @@ def pdb_prep(mol, out_prefix, tmpdir):
 	#charmm_prm = "~/prms/charmm/charmm_param.prm"
 	#charmm_rtf = "~/prms/charmm/charmm_param.rtf"
 	sblupath = sblu_path()
-	if str(sblupath).find("sblu") != (len(sblupath) - 4) or sblupath == os.path.expanduser("~"):
+	if os.path.basename(sblupath) != 'sblu' or not os.path.isfile(sblupath) or not os.access(sblupath, os.X_OK):
 		print sblupath
 		tkMessageBox.showinfo("Wrong path", "SBLU path is invalid")
-		return
+		return -1
 	sblu = [sblupath, 'pdb', 'prep', mol, '--no-minimize', '--out-prefix', out_prefix]
 	print "Preprocessing started"
 	p = subprocess.Popen(sblu, cwd=tmpdir)
@@ -186,12 +186,16 @@ def run_dock(recname, ligname):
 	cmd.save(rec, recname)
 	# Preprocess receptor if needed
 	if need_preprocessing("PREPROCESS", "receptor"):
+		if pdb_prep(rec, "rec_prep", tmpdir) == -1:
+			return
 		rec = pdb_prep(rec, "rec_prep", tmpdir)
 		text.insert('end', "Receptor preprocessed\n")
 	lig = tmpdir + "/ligand.pdb"
 	cmd.save(lig, ligname)
 	# Preprocess ligand if needed
 	if need_preprocessing("PREPROCESS", "ligand"):
+		if pdb_prep(lig, "lig_prep", tmpdir) == -1:
+			return
 		lig = pdb_prep(lig, "lig_prep", tmpdir)
 		text.insert('end', "Ligand preprocessed\n")
 	
@@ -273,6 +277,7 @@ def settings():
 	prepr_label = tk.Label(sett, text = "Make preprocess for").grid(column=0, row=3)
 	prepr_com = ttk.Combobox(sett, values = variants, state='readonly')
 	prepr_com.grid(column=0, row=4)
+	prepr_com.set(str(pymol.plugins.pref_get("PREPROCESS", d='no preprocess')))
 	#prepr_com.bind('<<ComboboxSelected>>', save_prep)
 	bSave = tk.Button(sett, text='Save', command=lambda: save_prep("PREPROCESS", prepr_com.get()))
 	bSave.grid(column=1, row=4)
