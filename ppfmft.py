@@ -208,8 +208,9 @@ def run_dock(recname, ligname):
 	# Preparations for running fmft (creating a string command for Popen)
 	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
 	wei = dirname + "/install-local/bin/prms/fmft_weights_ei.txt"
+	PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='1')
 	NRES = pymol.plugins.pref_get("NRES", d='24999')
-	fmftcmd = ['python', srcfmft, lig, rec, wei, '--nres', NRES]
+	fmftcmd = ['python', srcfmft, '--proc_count', PROC_COUNT, lig, rec, wei, '--nres', NRES]
 	
 	# Run!
 	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=tmpdir)
@@ -300,6 +301,17 @@ def settings():
 	sblupath_entry['state'] = 'readonly'
 	buttonChooseSblu = tk.Button(sett, text='Change', command=lambda: choose_folder(sblupath, sblupath_entry, "SBLU_PATH"))
 	buttonChooseSblu.grid(row=6, column=1)
+	
+	# Number of cpu cores to use for computation
+	proc_label = tk.Label(sett, text="Number of cpu cores to use for computation")
+	proc_label.grid(column=0, row=7, columnspan=2)
+	proc_entry = tk.Entry(sett, width=10)
+	proc_entry.grid(row=8, column=0)
+	PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='1')
+	proc_entry.insert(0, PROC_COUNT)
+	
+	proc_button = tk.Button(sett, text='Confirm', command=lambda: save_prep("PROC_COUNT", proc_entry.get()))
+	proc_button.grid(row=8, column=1)
 
 
 # Here is the main window where you select receptor und ligand
