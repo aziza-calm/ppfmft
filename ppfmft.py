@@ -208,7 +208,8 @@ def run_dock(recname, ligname):
 	# Preparations for running fmft (creating a string command for Popen)
 	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
 	wei = dirname + "/install-local/bin/prms/fmft_weights_ei.txt"
-	fmftcmd = ['python', srcfmft, lig, rec, wei]
+	NRES = pymol.plugins.pref_get("NRES", d='24999')
+	fmftcmd = ['python', srcfmft, lig, rec, wei, '--nres', NRES]
 	
 	# Run!
 	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=tmpdir)
@@ -330,3 +331,14 @@ def mytkdialog(parent):
 	
 	buttonSet = tk.Button(root, text='Settings', height=1, command=lambda: settings())
 	buttonSet.grid(column=1, row=1)
+	
+	# Number of results to store in the output file
+	nres_label = tk.Label(root, text="Number of results to store in the output file")
+	nres_label.grid(column=0, row=2, columnspan=2)
+	nres_entry = tk.Entry(root, width=10)
+	nres_entry.grid(row=3, column=0)
+	NRES = pymol.plugins.pref_get("NRES", d='24999')
+	nres_entry.insert(0, NRES)
+	
+	nres_button = tk.Button(root, text='Confirm', command=lambda: save_prep("NRES", nres_entry.get()))
+	nres_button.grid(row=3, column=1)
