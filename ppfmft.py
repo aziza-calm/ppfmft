@@ -143,7 +143,7 @@ def sblu_path():
 # Checking if fmft path is valid.
 # It should end with fmft_code_dev and shouldn't be equal to home path (that is default)
 def not_fmftpath(fmftpath):
-	if os.path.basename(fmftpath) != 'fmft_code_dev' or not os.path.isdir(fmftpath):
+	if os.path.basename(fmftpath) != 'fmft_suite' or not os.path.isdir(fmftpath):
 		return 1
 	else:
 		return 0
@@ -210,8 +210,8 @@ def run_dock(recname, ligname):
 	wei = dirname + "/install-local/bin/prms/fmft_weights_ei.txt"
 	PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='1')
 	NRES = pymol.plugins.pref_get("NRES", d='24999')
-	fmftcmd = ['python', srcfmft, '--proc_count', PROC_COUNT, lig, rec, wei, '--nres', NRES]
-	
+	fmftcmd = ['python', srcfmft, '--proc_count', PROC_COUNT, '--nres', NRES, lig, rec, wei]
+	print fmftcmd
 	# Run!
 	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=tmpdir)
 	
@@ -251,7 +251,7 @@ def run_dock(recname, ligname):
 		show_result(tmpdir, ligname)
 		
 	# Removing temporary directory
-	shutil.rmtree(tmpdir)
+	#shutil.rmtree(tmpdir)
 
 
 def update_selection(comboboxRec, comboboxLig):
