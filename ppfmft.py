@@ -23,6 +23,24 @@ def __init_plugin__(app):
         command=lambda: mytkdialog(app.root))
 
 
+def memory():
+    """
+    Get node total memory and memory usage
+    """
+    with open('/proc/meminfo', 'r') as mem:
+        ret = {}
+        tmp = 0
+        for i in mem:
+            sline = i.split()
+            if str(sline[0]) == 'MemTotal:':
+                ret['total'] = int(sline[1])
+            elif str(sline[0]) in ('MemFree:', 'Buffers:', 'Cached:'):
+                tmp += int(sline[1])
+        ret['free'] = tmp
+        ret['used'] = int(ret['total']) - int(ret['free'])
+    return ret
+
+
 def read_output(pipe, funcs):
 	for line in iter(pipe.readline, b''):
 		for func in funcs:
@@ -159,6 +177,13 @@ def need_preprocessing(key, mol):
 
 # runs fmft_dock.py
 def run_dock(recname, ligname):
+	# Checking free RAM
+	mem = memory()
+	PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='4')
+	if mem['free']/1024/1024 < int(PROC_COUNT) * 1.5:
+		tkMessageBox.showinfo("Warning", "Are you sure you want to use so many cores? Seems like you don't have enough memory")
+		return 4
+	
 	# Checking if receptor or ligand were somehow removed
 	if not recname in cmd.get_names(selection='(all)'):
 		tkMessageBox.showinfo("Warning", "Selected receptor doesn't exist anymore :c")
@@ -208,7 +233,6 @@ def run_dock(recname, ligname):
 	# Preparations for running fmft (creating a string command for Popen)
 	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
 	wei = dirname + "/install-local/bin/prms/fmft_weights_ei.txt"
-	PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='1')
 	NRES = pymol.plugins.pref_get("NRES", d='24999')
 	fmftcmd = ['python', srcfmft, '--proc_count', PROC_COUNT, '--nres', NRES, lig, rec, wei]
 	print fmftcmd
