@@ -283,10 +283,6 @@ def update_selection(comboboxRec, comboboxLig):
 	comboboxLig['values'] = cmd.get_names(selection='(all)')
 
 
-def arsch(x):
-	print "Archloch!" + str(x)
-	return -1*x
-
 def settings():
 	sett = tk.Tk()
 	sett.title("Settings")
