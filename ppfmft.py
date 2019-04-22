@@ -17,6 +17,10 @@ import numpy as np
 import os
 import tkFileDialog
 
+MEM_PER_PROC = 1.5  # GB
+PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='4')
+NRES = pymol.plugins.pref_get("NRES", d='1000')
+
 def __init_plugin__(app):
     app.menuBar.addmenuitem('Plugin', 'command',
         label='Dock them all',
@@ -179,8 +183,7 @@ def need_preprocessing(key, mol):
 def run_dock(recname, ligname):
 	# Checking free RAM
 	mem = memory()
-	PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='4')
-	if mem['free']/1024/1024 < int(PROC_COUNT) * 1.5:
+	if mem['free']/1024/1024 < int(PROC_COUNT) * MEM_PER_PROC:
 		tkMessageBox.showinfo("Warning", "Are you sure you want to use so many cores? Seems like you don't have enough memory")
 		return 4
 	
@@ -233,7 +236,6 @@ def run_dock(recname, ligname):
 	# Preparations for running fmft (creating a string command for Popen)
 	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
 	wei = dirname + "/install-local/bin/prms/fmft_weights_ei.txt"
-	NRES = pymol.plugins.pref_get("NRES", d='24999')
 	fmftcmd = ['python', srcfmft, '--proc_count', PROC_COUNT, '--nres', NRES, lig, rec, wei]
 	print fmftcmd
 	# Run!
