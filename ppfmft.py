@@ -329,7 +329,6 @@ def settings():
 	proc_label.grid(column=0, row=7, columnspan=2)
 	proc_entry = tk.Entry(sett, width=10)
 	proc_entry.grid(row=8, column=0)
-	PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='1')
 	proc_entry.insert(0, PROC_COUNT)
 	
 	proc_button = tk.Button(sett, text='Confirm', command=lambda: save_prep("PROC_COUNT", proc_entry.get()))
@@ -371,7 +370,6 @@ def mytkdialog(parent):
 	nres_label.grid(column=0, row=2, columnspan=2)
 	nres_entry = tk.Entry(root, width=10)
 	nres_entry.grid(row=3, column=0)
-	NRES = pymol.plugins.pref_get("NRES", d='24999')
 	nres_entry.insert(0, NRES)
 	
 	nres_button = tk.Button(root, text='Confirm', command=lambda: save_prep("NRES", nres_entry.get()))
