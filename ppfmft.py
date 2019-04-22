@@ -181,11 +181,16 @@ def need_preprocessing(key, mol):
 
 # runs fmft_dock.py
 def run_dock(recname, ligname):
+	PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='4')
+	print PROC_COUNT
 	# Checking free RAM
-	mem = memory()
-	if mem['free']/1024/1024 < int(PROC_COUNT) * MEM_PER_PROC:
-		tkMessageBox.showinfo("Warning", "Are you sure you want to use so many cores? Seems like you don't have enough memory")
-		return 4
+	try:
+		mem = memory()
+		if mem['free']/1024/1024 < int(PROC_COUNT) * MEM_PER_PROC:
+			tkMessageBox.showinfo("Warning", "Are you sure you want to use so many cores? Seems like you don't have enough memory")
+			return 4
+	except :
+		pass
 	
 	# Checking if receptor or ligand were somehow removed
 	if not recname in cmd.get_names(selection='(all)'):
@@ -203,7 +208,7 @@ def run_dock(recname, ligname):
 	if not os.path.isfile(dirname + '/install-local/bin/fmft_dock.py'):
 		tkMessageBox.showinfo("FMFT", "Maybe you forgot to run ./bootstrap.sh?")
 		return 3
-		
+
 	# Creating a window for dock log
 	dockw = tk.Tk()
 	dockw.title("FMFT: running...")
@@ -236,6 +241,7 @@ def run_dock(recname, ligname):
 	# Preparations for running fmft (creating a string command for Popen)
 	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
 	wei = dirname + "/install-local/bin/prms/fmft_weights_ei.txt"
+	NRES = pymol.plugins.pref_get("NRES", d='1000')
 	fmftcmd = ['python', srcfmft, '--proc_count', PROC_COUNT, '--nres', NRES, lig, rec, wei]
 	print fmftcmd
 	# Run!
@@ -329,6 +335,7 @@ def settings():
 	proc_label.grid(column=0, row=7, columnspan=2)
 	proc_entry = tk.Entry(sett, width=10)
 	proc_entry.grid(row=8, column=0)
+	PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='4')
 	proc_entry.insert(0, PROC_COUNT)
 	
 	proc_button = tk.Button(sett, text='Confirm', command=lambda: save_prep("PROC_COUNT", proc_entry.get()))
@@ -370,6 +377,7 @@ def mytkdialog(parent):
 	nres_label.grid(column=0, row=2, columnspan=2)
 	nres_entry = tk.Entry(root, width=10)
 	nres_entry.grid(row=3, column=0)
+	NRES = pymol.plugins.pref_get("NRES", d='1000')
 	nres_entry.insert(0, NRES)
 	
 	nres_button = tk.Button(root, text='Confirm', command=lambda: save_prep("NRES", nres_entry.get()))
