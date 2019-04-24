@@ -1,5 +1,5 @@
-#/home/aziza/Downloads/basa/pymol/ppfmft/ppfmft.py
-#/home/aziza/miniconda3/bin/sblu
+# /home/aziza/Downloads/basa/pymol/ppfmft/ppfmft.py
+# /home/aziza/miniconda3/bin/sblu
 
 import Tkinter as tk
 import ttk	
@@ -132,7 +132,7 @@ def _fmftpath():
 	fmftpath = tk.StringVar()
 
 	fmftpath_label1 = tk.Label(pathw, text="Specify the path to the /fmft_code_dev folder first")
-	fmftpath_label2 = tk.Label(pathw, text="Example:/home/aziza/Downloads/basa/fmft_code_dev")
+	fmftpath_label2 = tk.Label(pathw, text="Example: /home/aziza/Downloads/basa/fmft_code_dev")
 	fmftpath_label1.grid(row=2, column=0)
 	fmftpath_label2.grid(row=3, column=0)
 	fmftpath_entry = tk.Entry(pathw, width=45, textvariable=fmftpath)
@@ -179,19 +179,43 @@ def need_preprocessing(key, mol):
 		return 0
 
 
-# runs fmft_dock.py
-def run_dock(recname, ligname):
+def change_proc(recname, ligname):
+	proc = tk.Tk()
+	# Number of cpu cores to use for computation
+	proc_label = tk.Label(proc, text="Number of cpu cores to use for computation")
+	proc_label.grid(column=0, row=0, columnspan=2)
+	proc_entry = tk.Entry(proc, width=10)
+	proc_entry.grid(row=1, column=0)
 	PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='4')
-	print PROC_COUNT
+	proc_entry.insert(0, PROC_COUNT)
+	
+	proc_button = tk.Button(proc, text='Confirm', command=lambda: save_prep("PROC_COUNT", proc_entry.get()))
+	proc_button.grid(row=1, column=1)
+	
+	bContinue = tk.Button(proc, text="Continue", command=lambda: run_dock(recname, ligname))
+	bContinue.grid(row=2, column=1)
+
+
+def mem_check(recname, ligname):
+	PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='4')
 	# Checking free RAM
 	try:
 		mem = memory()
-		if mem['free']/1024/1024 < int(PROC_COUNT) * MEM_PER_PROC:
-			tkMessageBox.showinfo("Warning", "Are you sure you want to use so many cores? Seems like you don't have enough memory")
-			return 4
+		if mem['free']/1024.0/1024.0 < int(PROC_COUNT) * MEM_PER_PROC:
+			memw = tk.Tk()
+			memw.title("Memory")
+			mem_label = tk.Label(memw, text="Are you sure you want to use so many cores? Seems like you don't have enough memory")
+			mem_label.grid()
+			bSettings = tk.Button(memw, text="Settings", command=lambda: change_proc(recname, ligname))
+			bSettings.grid()
+		else:
+			run_dock(recname, ligname)
 	except :
 		pass
-	
+
+
+# runs fmft_dock.py
+def run_dock(recname, ligname):
 	# Checking if receptor or ligand were somehow removed
 	if not recname in cmd.get_names(selection='(all)'):
 		tkMessageBox.showinfo("Warning", "Selected receptor doesn't exist anymore :c")
@@ -366,7 +390,7 @@ def mytkdialog(parent):
 	buttonUpd.grid(column=2, row=0);
 	
  	buttonDock = tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14',
-						   command=lambda: run_dock(comboboxRec.get(), comboboxLig.get()))
+						   command=lambda: mem_check(comboboxRec.get(), comboboxLig.get()))
 	buttonDock.grid(column=2, row=1)
 	
 	buttonSet = tk.Button(root, text='Settings', height=1, command=lambda: settings())
