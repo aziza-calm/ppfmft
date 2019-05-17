@@ -322,7 +322,7 @@ def settings():
 	# FMFT path
 	fmftpath = fmft_path()
 	fmftpath_label1 = tk.Label(sett, text="Specify the path to the /fmft_code_dev")
-	fmftpath_label2 = tk.Label(sett, text="Example:/home/aziza/Downloads/basa/fmft_code_dev")
+	fmftpath_label2 = tk.Label(sett, text="Example:/home/aziza/Downloads/basa/fmft_suite")
 	fmftpath_label1.grid(row=0, column=0)
 	fmftpath_label2.grid(row=1, column=0)
 	fmftpath_entry = tk.Entry(sett, width=40, textvariable=fmftpath)
