@@ -178,6 +178,17 @@ def need_preprocessing(key, mol):
 		print mol + " without preprocess"
 		return 0
 
+def cluster_result(tmpdir, ligname):
+	sblupath = sblu_path()
+	if os.path.basename(sblupath) != 'sblu' or not os.path.isfile(sblupath) or not os.access(sblupath, os.X_OK):
+		print sblupath
+		tkMessageBox.showinfo("Wrong path", "SBLU path is invalid")
+		return -1
+	sblu = [sblupath, 'measure', 'pwrmsd', '-o', 'pwrmsd.000.0.0', ligname, 'ft.000.0.0', 'rm.000.0.0']
+	print "Clustering started"
+	p = subprocess.check_call(sblu, cwd=tmpdir)
+	sblu = [sblupath, 'docking', 'cluster', '--json', '-o', 'clusters.000.0.0.json', 'pwrmsd.000.0.0']
+	p = subprocess.check_call(sblu, cwd=tmpdir)
 
 def change_proc(recname, ligname):
 	proc = tk.Tk()
@@ -302,9 +313,12 @@ def run_dock(recname, ligname):
 	except tk.TclError:
 		pass
 	
+	# Cluster results
+	cluster_result(tmpdir, lig)
+	
 	# When the process is terminated, show results
 	if rc is not None:
-		show_result(tmpdir, ligname)
+		show_result(tmpdir, lig)
 		
 	# Removing temporary directory
 	#shutil.rmtree(tmpdir)
@@ -321,7 +335,7 @@ def settings():
 	
 	# FMFT path
 	fmftpath = fmft_path()
-	fmftpath_label1 = tk.Label(sett, text="Specify the path to the /fmft_code_dev")
+	fmftpath_label1 = tk.Label(sett, text="Specify the path to the /fmft_suite")
 	fmftpath_label2 = tk.Label(sett, text="Example:/home/aziza/Downloads/basa/fmft_suite")
 	fmftpath_label1.grid(row=0, column=0)
 	fmftpath_label2.grid(row=1, column=0)
