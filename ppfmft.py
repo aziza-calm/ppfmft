@@ -77,22 +77,22 @@ def show_result(tmpdir, ligname):
 	except IOError:
 		tkMessageBox.showinfo("Warning!", "Unable to load ft_file, rm_file.\nCheck if the path is correct or if there is enough space")
 		return 1
-	print "ft file loaded!"
+	
+	# Reading clustering result
 	clusters_path = tmpdir + "/clusters.000.0.0.json"
 	clusters_file = open(clusters_path)
-	print "clusters file opened!"
 	clusters_str = str(clusters_file.read())
 	centers = re.findall('"center": (.+?),', clusters_str)
-	print centers
+	
+	# showing n centers
 	for i in range(n):
 		num_state = i + 1
 		name_copy = "copy_ligand_" + str(i)
 		cmd.copy(name_copy, ligname)
-		j = centers[i]
-		print j
-		tv = ft_data[int(j), 1:4]
-		rm = rm_data[int(j)].reshape((3, 3))
-		en = ft_data[int(j), 4]
+		j = int(centers[i])
+		tv = ft_data[j, 1:4]
+		rm = rm_data[j].reshape((3, 3))
+		en = ft_data[j, 4]
 		cmd.translate(list(tv), name_copy)
 		cmd.rotate(list(get_axis(rm)), get_angle(rm), name_copy)
 		cmd.create("result", name_copy, 0, num_state)
