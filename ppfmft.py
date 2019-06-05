@@ -77,13 +77,19 @@ def show_result(tmpdir, ligname):
 	except IOError:
 		tkMessageBox.showinfo("Warning!", "Unable to load ft_file, rm_file.\nCheck if the path is correct or if there is enough space")
 		return 1
+	clusters_path = tmpdir + "clusters.000.0.0.json"
+	clusters_file = open(clusters_path)
+	clusters_str = str(clusters_file.read())
+	centers = re.findall('"center": (.+?),', clusters_str)
+	print centers
 	for i in range(n):
 		num_state = i + 1
 		name_copy = "copy_ligand_" + str(i)
 		cmd.copy(name_copy, ligname)
-		tv = ft_data[i, 1:4]
-		rm = rm_data[i].reshape((3, 3))
-		en = ft_data[i, 4]
+		j = centers[i]
+		tv = ft_data[j, 1:4]
+		rm = rm_data[j].reshape((3, 3))
+		en = ft_data[j, 4]
 		cmd.translate(list(tv), name_copy)
 		cmd.rotate(list(get_axis(rm)), get_angle(rm), name_copy)
 		cmd.create("result", name_copy, 0, num_state)
@@ -318,7 +324,7 @@ def run_dock(recname, ligname):
 	
 	# When the process is terminated, show results
 	if rc is not None:
-		show_result(tmpdir, lig)
+		show_result(tmpdir, ligname)
 		
 	# Removing temporary directory
 	#shutil.rmtree(tmpdir)
@@ -354,7 +360,7 @@ def settings():
 	prepr_com.grid(column=0, row=4)
 	prepr_com.set(str(pymol.plugins.pref_get("PREPROCESS", d='no preprocess')))
 	#prepr_com.bind('<<ComboboxSelected>>', save_prep)
-	bSave = tk.Button(sett, text='Save', command=lambda: save_prep("PREPROCESS", prepr_com.get()))
+	bSave = tk.Button(sett, text='Change', command=lambda: save_prep("PREPROCESS", prepr_com.get()))
 	bSave.grid(column=1, row=4)
 	
 	# sblu path
@@ -376,7 +382,7 @@ def settings():
 	PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='4')
 	proc_entry.insert(0, PROC_COUNT)
 	
-	proc_button = tk.Button(sett, text='Confirm', command=lambda: save_prep("PROC_COUNT", proc_entry.get()))
+	proc_button = tk.Button(sett, text='Change', command=lambda: save_prep("PROC_COUNT", proc_entry.get()))
 	proc_button.grid(row=8, column=1)
 
 
@@ -405,18 +411,18 @@ def mytkdialog(parent):
 	
  	buttonDock = tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14',
 						   command=lambda: mem_check(comboboxRec.get(), comboboxLig.get()))
-	buttonDock.grid(column=2, row=1)
+	buttonDock.grid(column=2, row=3)
 	
 	buttonSet = tk.Button(root, text='Settings', height=1, command=lambda: settings())
-	buttonSet.grid(column=1, row=1)
+	buttonSet.grid(column=1, row=3)
 	
 	# Number of results to store in the output file
 	nres_label = tk.Label(root, text="Number of results to store in the output file")
-	nres_label.grid(column=0, row=2, columnspan=2)
+	nres_label.grid(column=0, row=1, columnspan=2)
 	nres_entry = tk.Entry(root, width=10)
-	nres_entry.grid(row=3, column=0)
+	nres_entry.grid(row=2, column=0)
 	NRES = pymol.plugins.pref_get("NRES", d='1000')
 	nres_entry.insert(0, NRES)
 	
 	nres_button = tk.Button(root, text='Confirm', command=lambda: save_prep("NRES", nres_entry.get()))
-	nres_button.grid(row=3, column=1)
+	nres_button.grid(row=2, column=1)
