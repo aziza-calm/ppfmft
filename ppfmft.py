@@ -77,8 +77,10 @@ def show_result(tmpdir, ligname):
 	except IOError:
 		tkMessageBox.showinfo("Warning!", "Unable to load ft_file, rm_file.\nCheck if the path is correct or if there is enough space")
 		return 1
-	clusters_path = tmpdir + "clusters.000.0.0.json"
+	print "ft file loaded!"
+	clusters_path = tmpdir + "/clusters.000.0.0.json"
 	clusters_file = open(clusters_path)
+	print "clusters file opened!"
 	clusters_str = str(clusters_file.read())
 	centers = re.findall('"center": (.+?),', clusters_str)
 	print centers
@@ -87,9 +89,10 @@ def show_result(tmpdir, ligname):
 		name_copy = "copy_ligand_" + str(i)
 		cmd.copy(name_copy, ligname)
 		j = centers[i]
-		tv = ft_data[j, 1:4]
-		rm = rm_data[j].reshape((3, 3))
-		en = ft_data[j, 4]
+		print j
+		tv = ft_data[int(j), 1:4]
+		rm = rm_data[int(j)].reshape((3, 3))
+		en = ft_data[int(j), 4]
 		cmd.translate(list(tv), name_copy)
 		cmd.rotate(list(get_axis(rm)), get_angle(rm), name_copy)
 		cmd.create("result", name_copy, 0, num_state)
@@ -327,7 +330,7 @@ def run_dock(recname, ligname):
 		show_result(tmpdir, ligname)
 		
 	# Removing temporary directory
-	#shutil.rmtree(tmpdir)
+	shutil.rmtree(tmpdir)
 
 
 def update_selection(comboboxRec, comboboxLig):
