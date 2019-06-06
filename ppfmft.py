@@ -20,6 +20,7 @@ import tkFileDialog
 MEM_PER_PROC = 1.5  # GB
 PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='4')
 NRES = pymol.plugins.pref_get("NRES", d='1000')
+NUMSHOW = pymol.plugins.pref_get("NUMSHOW", d='10')
 
 def __init_plugin__(app):
     app.menuBar.addmenuitem('Plugin', 'command',
@@ -68,7 +69,7 @@ def get_angle(rm):
 # Results of docking
 # Kinda movie: ligand jumps around receptor
 def show_result(tmpdir, ligname):
-	n = 10 # number of positions of ligand
+	NUMSHOW = pymol.plugins.pref_get("NUMSHOW", d='10') # number of positions of ligand
 	ft_file = tmpdir + "/ft.000.0.0"
 	rm_file = tmpdir + "/rm.000.0.0"
 	try:
@@ -84,8 +85,9 @@ def show_result(tmpdir, ligname):
 	clusters_str = str(clusters_file.read())
 	centers = re.findall('"center": (.+?),', clusters_str)
 	
+	print int(NUMSHOW)
 	# showing n centers
-	for i in range(n):
+	for i in range(int(NUMSHOW)):
 		num_state = i + 1
 		name_copy = "copy_ligand_" + str(i)
 		cmd.copy(name_copy, ligname)
@@ -330,7 +332,7 @@ def run_dock(recname, ligname):
 		show_result(tmpdir, ligname)
 		
 	# Removing temporary directory
-	shutil.rmtree(tmpdir)
+	#shutil.rmtree(tmpdir)
 
 
 def update_selection(comboboxRec, comboboxLig):
@@ -387,6 +389,17 @@ def settings():
 	
 	proc_button = tk.Button(sett, text='Change', command=lambda: save_prep("PROC_COUNT", proc_entry.get()))
 	proc_button.grid(row=8, column=1)
+	
+	# NRES parameter of fmft_suite
+	nres_label = tk.Label(sett, text="NRES parameter of fmft_suite")
+	nres_label.grid(column=0, row=9, columnspan=2)
+	nres_entry = tk.Entry(sett, width=10)
+	nres_entry.grid(row=10, column=0)
+	NRES = pymol.plugins.pref_get("NRES", d='1000')
+	nres_entry.insert(0, NRES)
+	
+	nres_button = tk.Button(sett, text='Change', command=lambda: save_prep("NRES", nres_entry.get()))
+	nres_button.grid(row=10, column=1)
 
 
 # Here is the main window where you select receptor und ligand
@@ -419,13 +432,13 @@ def mytkdialog(parent):
 	buttonSet = tk.Button(root, text='Settings', height=1, command=lambda: settings())
 	buttonSet.grid(column=1, row=3)
 	
-	# Number of results to store in the output file
-	nres_label = tk.Label(root, text="Number of results to store in the output file")
+	# Number of results to show in the output
+	nres_label = tk.Label(root, text="Number of results to show in the output")
 	nres_label.grid(column=0, row=1, columnspan=2)
 	nres_entry = tk.Entry(root, width=10)
 	nres_entry.grid(row=2, column=0)
-	NRES = pymol.plugins.pref_get("NRES", d='1000')
-	nres_entry.insert(0, NRES)
+	NUMSHOW = pymol.plugins.pref_get("NUMSHOW", d='10')
+	nres_entry.insert(0, NUMSHOW)
 	
-	nres_button = tk.Button(root, text='Confirm', command=lambda: save_prep("NRES", nres_entry.get()))
+	nres_button = tk.Button(root, text='Confirm', command=lambda: save_prep("NUMSHOW", nres_entry.get()))
 	nres_button.grid(row=2, column=1)
