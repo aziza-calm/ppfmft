@@ -1,2 +1,2 @@
 # ppfmft
-It is a PyMOL plugin that runs fmft.
+It is a **P**yMOL **p**lugin that runs **fmft**.
