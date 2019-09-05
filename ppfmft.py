@@ -93,6 +93,13 @@ def show_result(tmpdir, ligname):
 	for i in range(int(NUMSHOW)):
 		num_state = i + 1
 		name_copy = "copy_ligand_" + str(i)
+		result_name = "result"
+		if result_name in cmd.get_names(selection='(all)'):
+			i = 1
+			result_name = "result_" + str(i)
+			while result_name in cmd.get_names(selection='(all)'):
+				i += 1
+				result_name = "result_" + str(i)
 		cmd.copy(name_copy, ligname)
 		j = int(centers[i])
 		tv = ft_data[j, 1:4]
@@ -100,7 +107,7 @@ def show_result(tmpdir, ligname):
 		en = ft_data[j, 4]
 		cmd.translate(list(tv), name_copy)
 		cmd.rotate(list(get_axis(rm)), get_angle(rm), name_copy)
-		cmd.create("result", name_copy, 0, num_state)
+		cmd.create(result_name, name_copy, 0, num_state)
 		cmd.delete(name_copy)
 	cmd.mplay()
 
