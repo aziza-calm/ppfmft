@@ -87,19 +87,19 @@ def show_result(tmpdir, ligname):
 	centers = []
 	for dic in clusters['clusters']:
 		centers.append(dic['center'])
-	
+
+	result_name = "result"
+	if result_name in cmd.get_names(selection='(all)'):
+		i = 1
+		result_name = "result_" + str(i)
+		while result_name in cmd.get_names(selection='(all)'):
+			i += 1
+			result_name = "result_" + str(i)
 	print int(NUMSHOW)
 	# showing n centers
 	for i in range(int(NUMSHOW)):
 		num_state = i + 1
 		name_copy = "copy_ligand_" + str(i)
-		result_name = "result"
-		if result_name in cmd.get_names(selection='(all)'):
-			i = 1
-			result_name = "result_" + str(i)
-			while result_name in cmd.get_names(selection='(all)'):
-				i += 1
-				result_name = "result_" + str(i)
 		cmd.copy(name_copy, ligname)
 		j = int(centers[i])
 		tv = ft_data[j, 1:4]
