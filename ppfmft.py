@@ -54,19 +54,6 @@ def read_output(pipe, funcs):
 	pipe.close()
 
 
-# Getting an axis from rotation matrix. We need it to use cmd.rotate
-def get_axis(rm):
-	eig_values, eig_vectors = np.linalg.eig(rm)
-	v_d = np.abs(eig_values - 1)
-	idx = np.argmin(v_d)
-	return np.float64(eig_vectors[:, idx])
-
-
-# Getting an angle from rotation matrix
-def get_angle(rm):
-	return np.arccos(0.5*(np.trace(rm)-1))
-
-
 # Results of docking
 # Kinda movie: ligand jumps around receptor
 def show_result(tmpdir, ligname):
@@ -99,10 +86,6 @@ def show_result(tmpdir, ligname):
 
 	# showing n centers
 	sblupath = sblu_path()
-	print sblupath
-	#if os.path.basename(sblupath) != 'sblu' or not os.path.isfile(sblupath) or not os.access(sblupath, os.X_OK):
-	#	tkMessageBox.showinfo("Wrong path", "SBLU path is invalid")
-	#	return None
 	sblu_mod = [sblupath, 'docking', 'gen_cluster_pdb', clusters_path, ft_file, rm_file, ligname]
 	print sblu_mod
 	p = subprocess.Popen(sblu_mod, cwd=tmpdir)
@@ -152,30 +135,6 @@ def choose_folder(s, path_entry, key):
 	path_entry['state'] = 'readonly'
 
 
-# an idiotic window asking you to enter the path
-# useless for now, but may be used in the future
-def _fmftpath():
-	pathw = tk.Tk()
-	pathw.title("Path")
-	fmftpath = tk.StringVar()
-
-	fmftpath_label1 = tk.Label(pathw, text="Specify the path to the /fmft_code_dev folder first")
-	fmftpath_label2 = tk.Label(pathw, text="Example: /home/aziza/Downloads/basa/fmft_code_dev")
-	fmftpath_label1.grid(row=2, column=0)
-	fmftpath_label2.grid(row=3, column=0)
-	fmftpath_entry = tk.Entry(pathw, width=45, textvariable=fmftpath)
-	fmftpath_entry.grid(row=4, column=0)
-	# this is a default path
-	user_path = os.path.expanduser("~")
-	fmftpath = pymol.plugins.pref_get("FMFT_PATH", d=user_path)
-	fmftpath_entry.insert(0, fmftpath)
-	
-	buttonChoose = tk.Button(pathw, text='Choose', command=lambda: choose_folder(fmftpath, fmftpath_entry, "FMFT_PATH"))
-	buttonChoose.grid(column=1, row=4)
-	
-	return fmftpath
-
-
 # Getting fmft path from config file
 def fmft_path():
 	user_path = os.path.expanduser("~")
@@ -206,6 +165,7 @@ def need_preprocessing(key, mol):
 		print mol + " without preprocess"
 		return 0
 
+
 def cluster_result(tmpdir, ligname):
 	sblupath = sblu_path()
 	if os.path.basename(sblupath) != 'sblu' or not os.path.isfile(sblupath) or not os.access(sblupath, os.X_OK):
@@ -217,6 +177,7 @@ def cluster_result(tmpdir, ligname):
 	p = subprocess.check_call(sblu, cwd=tmpdir)
 	sblu = [sblupath, 'docking', 'cluster', '--json', '-o', 'clusters.000.0.0.json', 'pwrmsd.000.0.0']
 	p = subprocess.check_call(sblu, cwd=tmpdir)
+
 
 def change_proc(recname, ligname):
 	proc = tk.Tk()
@@ -249,7 +210,7 @@ def mem_check(recname, ligname):
 			bSettings.grid()
 		else:
 			run_dock(recname, ligname)
-	except :
+	except:
 		pass
 
 
@@ -428,27 +389,27 @@ def mytkdialog(parent):
 		root.iconbitmap('@idea.xbm')
 	except tk.TclError:
 		print "Some problems with icon, but still works"
-	
+
 	selections = cmd.get_names(selection='(all)')
-	
+
 	comboboxRec = ttk.Combobox(root, values=selections, height=3, state='readonly')
 	comboboxRec.set(u"Receptor")
 	comboboxRec.grid(column=0, row=0)
-	
+
 	comboboxLig = ttk.Combobox(root, values=selections, height=3, state='readonly')
 	comboboxLig.set(u"Ligand")
 	comboboxLig.grid(column=1, row=0)
-	
+
 	buttonUpd = tk.Button(root, text='Update list', height=1, command=lambda: update_selection(comboboxRec, comboboxLig));
 	buttonUpd.grid(column=2, row=0);
-	
- 	buttonDock = tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14',
-						   command=lambda: mem_check(comboboxRec.get(), comboboxLig.get()))
+
+	buttonDock = tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14',
+							command=lambda: mem_check(comboboxRec.get(), comboboxLig.get()))
 	buttonDock.grid(column=2, row=3)
-	
+
 	buttonSet = tk.Button(root, text='Settings', height=1, command=lambda: settings())
 	buttonSet.grid(column=1, row=3)
-	
+
 	# Number of results to show in the output
 	nres_label = tk.Label(root, text="Number of results to show in the output")
 	nres_label.grid(column=0, row=1, columnspan=2)
@@ -456,6 +417,6 @@ def mytkdialog(parent):
 	nres_entry.grid(row=2, column=0)
 	NUMSHOW = pymol.plugins.pref_get("NUMSHOW", d='10')
 	nres_entry.insert(0, NUMSHOW)
-	
+
 	nres_button = tk.Button(root, text='Confirm', command=lambda: save_prep("NUMSHOW", nres_entry.get()))
 	nres_button.grid(row=2, column=1)
