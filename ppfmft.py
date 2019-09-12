@@ -96,17 +96,24 @@ def show_result(tmpdir, ligname):
 			i += 1
 			result_name = "result_" + str(i)
 	print int(NUMSHOW)
+
 	# showing n centers
+	sblupath = sblu_path()
+	print sblupath
+	#if os.path.basename(sblupath) != 'sblu' or not os.path.isfile(sblupath) or not os.access(sblupath, os.X_OK):
+	#	tkMessageBox.showinfo("Wrong path", "SBLU path is invalid")
+	#	return None
+	sblu_mod = [sblupath, 'docking', 'gen_cluster_pdb', clusters_path, ft_file, rm_file, ligname]
+	print sblu_mod
+	p = subprocess.Popen(sblu_mod, cwd=tmpdir)
+	print "Build cluster models"
+	while p.poll() is None:
+		time.sleep(0.01)
 	for i in range(int(NUMSHOW)):
 		num_state = i + 1
 		name_copy = "copy_ligand_" + str(i)
-		cmd.copy(name_copy, ligname)
-		j = int(centers[i])
-		tv = ft_data[j, 1:4]
-		rm = rm_data[j].reshape((3, 3))
-		en = ft_data[j, 4]
-		cmd.translate(list(tv), name_copy)
-		cmd.rotate(list(get_axis(rm)), get_angle(rm), name_copy)
+		lig_load = tmpdir + "/lig.0" + str(i) + ".pdb"
+		cmd.load(lig_load, name_copy)
 		cmd.create(result_name, name_copy, 0, num_state)
 		cmd.delete(name_copy)
 	cmd.mplay()
@@ -339,7 +346,7 @@ def run_dock(recname, ligname):
 	
 	# When the process is terminated, show results
 	if rc is not None:
-		show_result(tmpdir, ligname)
+		show_result(tmpdir, lig)
 		
 	# Removing temporary directory
 	#shutil.rmtree(tmpdir)
