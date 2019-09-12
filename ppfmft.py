@@ -78,7 +78,7 @@ def show_result(tmpdir, ligname):
 		rm_data = np.loadtxt(rm_file)
 	except IOError:
 		tkMessageBox.showinfo("Warning!", "Unable to load ft_file, rm_file.\nCheck if the path is correct or if there is enough space")
-		return 1
+		return None
 	
 	# Reading clustering result
 	clusters_path = tmpdir + "/clusters.000.0.0.json"
@@ -127,7 +127,7 @@ def pdb_prep(mol, out_prefix, tmpdir):
 	if os.path.basename(sblupath) != 'sblu' or not os.path.isfile(sblupath) or not os.access(sblupath, os.X_OK):
 		print sblupath
 		tkMessageBox.showinfo("Wrong path", "SBLU path is invalid")
-		return -1
+		return None
 	sblu = [sblupath, 'pdb', 'prep', mol, '--no-minimize', '--out-prefix', out_prefix]
 	print "Preprocessing started"
 	p = subprocess.Popen(sblu, cwd=tmpdir)
@@ -211,7 +211,7 @@ def cluster_result(tmpdir, ligname):
 	if os.path.basename(sblupath) != 'sblu' or not os.path.isfile(sblupath) or not os.access(sblupath, os.X_OK):
 		print sblupath
 		tkMessageBox.showinfo("Wrong path", "SBLU path is invalid")
-		return -1
+		return None
 	sblu = [sblupath, 'measure', 'pwrmsd', '-o', 'pwrmsd.000.0.0', ligname, 'ft.000.0.0', 'rm.000.0.0']
 	print "Clustering started"
 	p = subprocess.check_call(sblu, cwd=tmpdir)
@@ -258,19 +258,19 @@ def run_dock(recname, ligname):
 	# Checking if receptor or ligand were somehow removed
 	if not recname in cmd.get_names(selection='(all)'):
 		tkMessageBox.showinfo("Warning", "Selected receptor doesn't exist anymore :c")
-		return 1
+		return None
 	if not ligname in cmd.get_names(selection='(all)'):
 		tkMessageBox.showinfo("Warning", "Selected ligand doesn't exist anymore :c")
-		return 1
+		return None
 	dirname = fmft_path()
 	if not_fmftpath(dirname):
 		print "Invalid FMFT path"
 		tkMessageBox.showinfo("Invalid FMFT path", "Something wrong with FMFT path. Please, specify it in settings.")
-		return 2
+		return None
 	
 	if not os.path.isfile(dirname + '/install-local/bin/fmft_dock.py'):
 		tkMessageBox.showinfo("FMFT", "Maybe you forgot to run ./bootstrap.sh?")
-		return 3
+		return None
 
 	# Creating a window for dock log
 	dockw = tk.Tk()
