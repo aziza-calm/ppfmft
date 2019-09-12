@@ -24,27 +24,25 @@ NRES = pymol.plugins.pref_get("NRES", d='1000')
 NUMSHOW = pymol.plugins.pref_get("NUMSHOW", d='10')
 
 def __init_plugin__(app):
-    app.menuBar.addmenuitem('Plugin', 'command',
-        label='Dock them all',
-        command=lambda: mytkdialog(app.root))
+	app.menuBar.addmenuitem('Plugin', 'command',
+		label='Dock them all',
+		command=lambda: mytkdialog(app.root))
 
 
 def memory():
-    """
-    Get node total memory and memory usage
-    """
-    with open('/proc/meminfo', 'r') as mem:
-        ret = {}
-        tmp_free = 0
-        for i in mem:
-            sline = i.split()
-            if sline[0] == 'MemTotal:':
-                ret['total'] = sline[1]
-            elif sline[0] in ('MemFree:', 'Buffers:', 'Cached:'):
-                tmp_free += int(sline[1])
-        ret['free'] = tmp_free
-        ret['used'] = int(ret['total']) - ret['free']
-    return ret
+	# Get node total memory and memory usage
+	with open('/proc/meminfo', 'r') as mem:
+		ret = {}
+		tmp_free = 0
+		for i in mem:
+			sline = i.split()
+			if sline[0] == 'MemTotal:':
+				ret['total'] = sline[1]
+			elif sline[0] in ('MemFree:', 'Buffers:', 'Cached:'):
+				tmp_free += int(sline[1])
+		ret['free'] = tmp_free
+		ret['used'] = int(ret['total']) - ret['free']
+	return ret
 
 
 def read_output(pipe, funcs):
@@ -66,7 +64,7 @@ def show_result(tmpdir, ligname):
 	except IOError:
 		tkMessageBox.showinfo("Warning!", "Unable to load ft_file, rm_file.\nCheck if the path is correct or if there is enough space")
 		return None
-	
+
 	# Reading clustering result
 	clusters_path = tmpdir + "/clusters.000.0.0.json"
 	with open(clusters_path, "r") as clusters_file:
@@ -188,10 +186,10 @@ def change_proc(recname, ligname):
 	proc_entry.grid(row=1, column=0)
 	PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='4')
 	proc_entry.insert(0, PROC_COUNT)
-	
+
 	proc_button = tk.Button(proc, text='Confirm', command=lambda: save_prep("PROC_COUNT", proc_entry.get()))
 	proc_button.grid(row=1, column=1)
-	
+
 	bContinue = tk.Button(proc, text="Continue", command=lambda: run_dock(recname, ligname))
 	bContinue.grid(row=2, column=1)
 
@@ -228,7 +226,7 @@ def run_dock(recname, ligname):
 		print "Invalid FMFT path"
 		tkMessageBox.showinfo("Invalid FMFT path", "Something wrong with FMFT path. Please, specify it in settings.")
 		return None
-	
+
 	if not os.path.isfile(dirname + '/install-local/bin/fmft_dock.py'):
 		tkMessageBox.showinfo("FMFT", "Maybe you forgot to run ./bootstrap.sh?")
 		return None
@@ -243,7 +241,7 @@ def run_dock(recname, ligname):
 
 	# Creating a temporary directory
 	tmpdir = tempfile.mkdtemp()
-	
+
 	# Making copies of receptor and ligand into tmpdir
 	rec = tmpdir + "/receptor.pdb"
 	cmd.save(rec, recname)
@@ -261,7 +259,7 @@ def run_dock(recname, ligname):
 			return
 		lig = pdb_prep(lig, "lig_prep", tmpdir)
 		text.insert('end', "Ligand preprocessed\n")
-	
+
 	# Preparations for running fmft (creating a string command for Popen)
 	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
 	wei = dirname + "/install-local/bin/prms/fmft_weights_ei.txt"
@@ -270,7 +268,7 @@ def run_dock(recname, ligname):
 	print fmftcmd
 	# Run!
 	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=tmpdir)
-	
+
 	# Catching log lines using threads and queue
 	outs, errs = [], []
 	q = Queue()
@@ -301,14 +299,14 @@ def run_dock(recname, ligname):
 		else: dockw.title("FMFT: failed")
 	except tk.TclError:
 		pass
-	
+
 	# Cluster results
 	cluster_result(tmpdir, lig)
-	
+
 	# When the process is terminated, show results
 	if rc is not None:
 		show_result(tmpdir, lig)
-		
+
 	# Removing temporary directory
 	#shutil.rmtree(tmpdir)
 
@@ -321,7 +319,7 @@ def update_selection(comboboxRec, comboboxLig):
 def settings():
 	sett = tk.Tk()
 	sett.title("Settings")
-	
+
 	# FMFT path
 	fmftpath = fmft_path()
 	fmftpath_label1 = tk.Label(sett, text="Specify the path to the /fmft_suite")
@@ -336,7 +334,7 @@ def settings():
 	buttonChooseFmft = tk.Button(sett, text='Change', command=lambda: choose_folder(fmftpath, fmftpath_entry, "FMFT_PATH"))
 	buttonChooseFmft.grid(column=1, row=2)
 	fmftpath_entry.bind('<Return>', run_dock)
-	
+
 	variants = ['only ligand', 'only receptor', 'ligand and receptor', 'no preprocess']
 	prepr_label = tk.Label(sett, text = "Make preprocess for").grid(column=0, row=3)
 	prepr_com = ttk.Combobox(sett, values = variants, state='readonly')
@@ -345,7 +343,7 @@ def settings():
 	#prepr_com.bind('<<ComboboxSelected>>', save_prep)
 	bSave = tk.Button(sett, text='Change', command=lambda: save_prep("PREPROCESS", prepr_com.get()))
 	bSave.grid(column=1, row=4)
-	
+
 	# sblu path
 	sblu_label = tk.Label(sett, text="Specify the path to /sblu")
 	sblu_label.grid(row=5, column=0)
@@ -356,7 +354,7 @@ def settings():
 	sblupath_entry['state'] = 'readonly'
 	buttonChooseSblu = tk.Button(sett, text='Change', command=lambda: choose_folder(sblupath, sblupath_entry, "SBLU_PATH"))
 	buttonChooseSblu.grid(row=6, column=1)
-	
+
 	# Number of cpu cores to use for computation
 	proc_label = tk.Label(sett, text="Number of cpu cores to use for computation")
 	proc_label.grid(column=0, row=7, columnspan=2)
@@ -364,10 +362,10 @@ def settings():
 	proc_entry.grid(row=8, column=0)
 	PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='4')
 	proc_entry.insert(0, PROC_COUNT)
-	
+
 	proc_button = tk.Button(sett, text='Change', command=lambda: save_prep("PROC_COUNT", proc_entry.get()))
 	proc_button.grid(row=8, column=1)
-	
+
 	# NRES parameter of fmft_suite
 	nres_label = tk.Label(sett, text="NRES parameter of fmft_suite")
 	nres_label.grid(column=0, row=9, columnspan=2)
@@ -375,7 +373,7 @@ def settings():
 	nres_entry.grid(row=10, column=0)
 	NRES = pymol.plugins.pref_get("NRES", d='1000')
 	nres_entry.insert(0, NRES)
-	
+
 	nres_button = tk.Button(sett, text='Change', command=lambda: save_prep("NRES", nres_entry.get()))
 	nres_button.grid(row=10, column=1)
 
