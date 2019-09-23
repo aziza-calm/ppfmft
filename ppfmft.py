@@ -1,22 +1,30 @@
 # /home/aziza/Downloads/basa/pymol/ppfmft/ppfmft.py
 # /home/aziza/miniconda3/bin/sblu
+from __future__ import print_function
 
-import Tkinter as tk
-import ttk	
 from pymol import cmd
 import pymol
 import re
 import subprocess
-import tkMessageBox
 import time
+import json
+import numpy as np
+import os
 import shutil
 import tempfile
 from threading  import Thread
-from Queue import Queue, Empty
-import numpy as np
-import os
-import tkFileDialog
-import json
+try:
+	import Tkinter as tk
+	import ttk  
+	import tkMessageBox
+	from Queue import Queue, Empty
+	import tkFileDialog
+except ImportError:
+	import tkinter as tk
+	from tkinter import ttk
+	from tkinter import messagebox as tkMessageBox
+	from tkinter import messagebox as tkFileDialog
+	from queue import Queue, Empty
 
 MEM_PER_PROC = 1.5  # GB
 PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='4')
@@ -80,14 +88,14 @@ def show_result(tmpdir, ligname):
 		while result_name in cmd.get_names(selection='(all)'):
 			i += 1
 			result_name = "result_" + str(i)
-	print int(NUMSHOW)
+	print(int(NUMSHOW))
 
 	# showing n centers
 	sblupath = sblu_path()
 	sblu_mod = [sblupath, 'docking', 'gen_cluster_pdb', clusters_path, ft_file, rm_file, ligname]
-	print sblu_mod
+	print(sblu_mod)
 	p = subprocess.Popen(sblu_mod, cwd=tmpdir)
-	print "Build cluster models"
+	print("Build cluster models")
 	while p.poll() is None:
 		time.sleep(0.01)
 	for i in range(int(NUMSHOW)):
@@ -106,11 +114,11 @@ def pdb_prep(mol, out_prefix, tmpdir):
 	#charmm_rtf = "~/prms/charmm/charmm_param.rtf"
 	sblupath = sblu_path()
 	if os.path.basename(sblupath) != 'sblu' or not os.path.isfile(sblupath) or not os.access(sblupath, os.X_OK):
-		print sblupath
+		print(sblupath)
 		tkMessageBox.showinfo("Wrong path", "SBLU path is invalid")
 		return None
 	sblu = [sblupath, 'pdb', 'prep', mol, '--no-minimize', '--out-prefix', out_prefix]
-	print "Preprocessing started"
+	print("Preprocessing started")
 	p = subprocess.Popen(sblu, cwd=tmpdir)
 	while p.poll() is None:  # While our process is running
 		time.sleep(0.01)
@@ -160,18 +168,18 @@ def need_preprocessing(key, mol):
 	if mol in str(pymol.plugins.pref_get(key)):
 		return 1
 	else:
-		print mol + " without preprocess"
+		print(mol + " without preprocess")
 		return 0
 
 
 def cluster_result(tmpdir, ligname):
 	sblupath = sblu_path()
 	if os.path.basename(sblupath) != 'sblu' or not os.path.isfile(sblupath) or not os.access(sblupath, os.X_OK):
-		print sblupath
+		print(sblupath)
 		tkMessageBox.showinfo("Wrong path", "SBLU path is invalid")
 		return None
 	sblu = [sblupath, 'measure', 'pwrmsd', '-o', 'pwrmsd.000.0.0', ligname, 'ft.000.0.0', 'rm.000.0.0']
-	print "Clustering started"
+	print("Clustering started")
 	p = subprocess.check_call(sblu, cwd=tmpdir)
 	sblu = [sblupath, 'docking', 'cluster', '--json', '-o', 'clusters.000.0.0.json', 'pwrmsd.000.0.0']
 	p = subprocess.check_call(sblu, cwd=tmpdir)
@@ -223,7 +231,7 @@ def run_dock(recname, ligname):
 		return None
 	dirname = fmft_path()
 	if not_fmftpath(dirname):
-		print "Invalid FMFT path"
+		print("Invalid FMFT path")
 		tkMessageBox.showinfo("Invalid FMFT path", "Something wrong with FMFT path. Please, specify it in settings.")
 		return None
 
@@ -265,7 +273,7 @@ def run_dock(recname, ligname):
 	wei = dirname + "/install-local/bin/prms/fmft_weights_ei.txt"
 	NRES = pymol.plugins.pref_get("NRES", d='1000')
 	fmftcmd = ['python', srcfmft, '--proc_count', PROC_COUNT, '--nres', NRES, lig, rec, wei]
-	print fmftcmd
+	print(fmftcmd)
 	# Run!
 	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=tmpdir)
 
@@ -278,7 +286,7 @@ def run_dock(recname, ligname):
 		t.daemon = True
 		t.start()
 
-        while p.poll() is None:  # While our process is running
+	while p.poll() is None:  # While our process is running
 		time.sleep(0.01)
 		while True:  # Read all elements currently in Queue
 			try:
@@ -339,7 +347,7 @@ def settings():
 	prepr_label = tk.Label(sett, text = "Make preprocess for").grid(column=0, row=3)
 	prepr_com = ttk.Combobox(sett, values = variants, state='readonly')
 	prepr_com.grid(column=0, row=4)
-	prepr_com.set(str(pymol.plugins.pref_get("PREPROCESS", d='no preprocess')))
+	prepr_com.set(str(pymol.plugins.pref_get("PREPROCESS", d='ligand and receptor')))
 	#prepr_com.bind('<<ComboboxSelected>>', save_prep)
 	bSave = tk.Button(sett, text='Change', command=lambda: save_prep("PREPROCESS", prepr_com.get()))
 	bSave.grid(column=1, row=4)
@@ -386,7 +394,16 @@ def mytkdialog(parent):
 	try:
 		root.iconbitmap('@idea.xbm')
 	except tk.TclError:
-		print "Some problems with icon, but still works"
+		print("Some problems with icon, but still works")
+
+	user_path = os.path.expanduser("~")
+	if os.path.exists(user_path + "/.pymolpluginsrc.py"):
+		with open(user_path + "/.pymolpluginsrc.py") as plug:
+			if not 'FMFT_PATH' in plug.read():
+				settings()
+	else:
+		print("No config file!")
+		settings()
 
 	selections = cmd.get_names(selection='(all)')
 
