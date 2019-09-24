@@ -102,6 +102,9 @@ def show_result(tmpdir, ligname):
 		num_state = i + 1
 		name_copy = "copy_ligand_" + str(i)
 		lig_load = tmpdir + "/lig.0" + str(i) + ".pdb"
+		if not os.path.isfile(lig_load):
+			tkMessageBox.showinfo("Warning!", "No cluster models found!")
+			return
 		cmd.load(lig_load, name_copy)
 		cmd.create(result_name, name_copy, 0, num_state)
 		cmd.delete(name_copy)
