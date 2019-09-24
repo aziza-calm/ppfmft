@@ -396,6 +396,7 @@ def mytkdialog(parent):
 	except tk.TclError:
 		print("Some problems with icon, but still works")
 
+	# Check if it's the first run
 	user_path = os.path.expanduser("~")
 	if os.path.exists(user_path + "/.pymolpluginsrc.py"):
 		with open(user_path + "/.pymolpluginsrc.py") as plug:
@@ -404,6 +405,16 @@ def mytkdialog(parent):
 	else:
 		print("No config file!")
 		settings()
+
+	# Check if translation matrices are precomputed
+	fmftpath = fmft_path()
+	if os.path.exists(fmftpath + '/install-local/fmft_data/'):
+		if not os.listdir(fmftpath + '/install-local/fmft_data/'):
+			tkMessageBox.showinfo("Warning", "No translation matrices!")
+			return
+	else:
+		tkMessageBox.showinfo("Warning", "Couldn't find {your_fmft_path}/install-local/fmft_data/")
+		return
 
 	selections = cmd.get_names(selection='(all)')
 
