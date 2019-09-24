@@ -18,6 +18,8 @@ To run this plugin you need:
 
 Note that plugin was written on python 2 and works only with PyMOL 1.7.x.
 
+To install a plugin, open PyMOL and then go to `Plugin > Plugin Manager > Install new plugin`. Then press button `Choose file` and browse for `ppfmft.py`.
+
 ## What it does
 
 This plugin allows you to run fmft directly from PyMOL. You pick the molecules to dock, adjust the settings and run it. Molecules are preprocessed by default. Upon completion of the process, the plugin clusters the results and loads them as a pymol object with a certain number of states (this number corresponds to the number of results that you select earlier).
