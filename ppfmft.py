@@ -168,7 +168,7 @@ def not_fmftpath(fmftpath):
 
 
 def need_preprocessing(key, mol):
-	if mol in str(pymol.plugins.pref_get(key)):
+	if mol in str(pymol.plugins.pref_get(key, d='ligand and receptor')):
 		return 1
 	else:
 		print(mol + " without preprocess")
@@ -181,10 +181,19 @@ def cluster_result(tmpdir, ligname):
 		print(sblupath)
 		tkMessageBox.showinfo("Wrong path", "SBLU path is invalid")
 		return None
+	if not os.path.isfile(tmpdir + "/ft.000.0.0"):
+		tkMessageBox.showinfo("Warning!", "No ft.000.0.0 file found!")
+		return
+	if not os.path.isfile(tmpdir + "/rm.000.0.0"):
+		tkMessageBox.showinfo("Warning!", "No rm.000.0.0 file found!")
+		return
 	sblu = [sblupath, 'measure', 'pwrmsd', '-o', 'pwrmsd.000.0.0', ligname, 'ft.000.0.0', 'rm.000.0.0']
 	print("Clustering started")
 	p = subprocess.check_call(sblu, cwd=tmpdir)
 	sblu = [sblupath, 'docking', 'cluster', '--json', '-o', 'clusters.000.0.0.json', 'pwrmsd.000.0.0']
+	if not os.path.isfile(tmpdir + "/pwrmsd.000.0.0"):
+		tkMessageBox.showinfo("Warning!", "No pwrmsd.000.0.0 file found!")
+		return
 	p = subprocess.check_call(sblu, cwd=tmpdir)
 
 
@@ -351,7 +360,6 @@ def settings():
 	prepr_com = ttk.Combobox(sett, values = variants, state='readonly')
 	prepr_com.grid(column=0, row=4)
 	prepr_com.set(str(pymol.plugins.pref_get("PREPROCESS", d='ligand and receptor')))
-	#prepr_com.bind('<<ComboboxSelected>>', save_prep)
 	bSave = tk.Button(sett, text='Change', command=lambda: save_prep("PREPROCESS", prepr_com.get()))
 	bSave.grid(column=1, row=4)
 
