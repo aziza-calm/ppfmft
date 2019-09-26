@@ -12,8 +12,8 @@ It is a **P**yMOL **p**lugin that runs **fmft**.
 ## Before starting
 To run this plugin you need:
 
-* [fmft_suite](https://bitbucket.org/abc-group/fmft_suite/src/669742fae4d05cc662300aae318bd1ec8876d378/)
-* [sblu](https://bitbucket.org/bu-structure/sb-lab-utils/src/master/)
+* [Fast Manifold Fourier Transform suite](https://bitbucket.org/abc-group/fmft_suite/src/669742fae4d05cc662300aae318bd1ec8876d378/)
+* [sb-lab-utils](https://bitbucket.org/bu-structure/sb-lab-utils/src/master/)
 * and of course [PyMOL](https://pymol.org/2/)
 
 Note that plugin was written on python 2 and works only with PyMOL 1.7.x.
