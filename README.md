@@ -30,5 +30,11 @@ This plugin allows you to run fmft directly from PyMOL. You pick the molecules t
 
 ## Issues list
 
+- [ ] fix settings for the first run.
+
+During the first run in the settings window when specifying the paths to fmft, the path to the sblu also changes. And visa versa, when specifying the path to sblu, the path to fmft changes. 
+But these "extra" changes occur only visually, and in the config file itself all paths are saved correctly. Also, as was already mentioned, it behaves like this only on the first run.
+Anyway, this bug should be fixed as it confuses the user.
+
 - [ ] complete README
 - [ ] compatibility with PyMOL2 (and Python3)
