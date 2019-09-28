@@ -8,7 +8,6 @@ import re
 import subprocess
 import time
 import json
-import numpy as np
 import os
 import shutil
 import tempfile
@@ -66,12 +65,6 @@ def show_result(tmpdir, ligname):
 	NUMSHOW = pymol.plugins.pref_get("NUMSHOW", d='10') # number of positions of ligand
 	ft_file = tmpdir + "/ft.000.0.0"
 	rm_file = tmpdir + "/rm.000.0.0"
-	try:
-		ft_data = np.loadtxt(ft_file)
-		rm_data = np.loadtxt(rm_file)
-	except IOError:
-		tkMessageBox.showinfo("Warning!", "Unable to load ft_file, rm_file.\nCheck if the path is correct or if there is enough space")
-		return None
 
 	# Reading clustering result
 	clusters_path = tmpdir + "/clusters.000.0.0.json"
@@ -197,7 +190,7 @@ def cluster_result(tmpdir, ligname):
 	p = subprocess.check_call(sblu, cwd=tmpdir)
 
 
-def change_proc(recname, ligname):
+def change_proc(recname, ligname, center_selection):
 	proc = tk.Tk()
 	# Number of cpu cores to use for computation
 	proc_label = tk.Label(proc, text="Number of cpu cores to use for computation")
@@ -210,11 +203,11 @@ def change_proc(recname, ligname):
 	proc_button = tk.Button(proc, text='Confirm', command=lambda: save_prep("PROC_COUNT", proc_entry.get()))
 	proc_button.grid(row=1, column=1)
 
-	bContinue = tk.Button(proc, text="Continue", command=lambda: run_dock(recname, ligname))
+	bContinue = tk.Button(proc, text="Continue", command=lambda: run_dock(recname, ligname, center_selection))
 	bContinue.grid(row=2, column=1)
 
 
-def mem_check(recname, ligname):
+def mem_check(recname, ligname, center):
 	PROC_COUNT = pymol.plugins.pref_get("PROC_COUNT", d='4')
 	# Checking free RAM
 	try:
@@ -224,16 +217,22 @@ def mem_check(recname, ligname):
 			memw.title("Memory")
 			mem_label = tk.Label(memw, text="Are you sure you want to use so many cores? Seems like you don't have enough memory")
 			mem_label.grid()
-			bSettings = tk.Button(memw, text="Settings", command=lambda: change_proc(recname, ligname))
+			bSettings = tk.Button(memw, text="Settings", command=lambda: change_proc(recname, ligname, center))
 			bSettings.grid()
 		else:
-			run_dock(recname, ligname)
+			run_dock(recname, ligname, center)
 	except:
 		pass
 
 
 # runs fmft_dock.py
-def run_dock(recname, ligname):
+def run_dock(recname, ligname, center_selection):
+	# Checking if center of mass was selected
+	if center_selection != "selection":
+		centre = cmd.centerofmass()
+	else:
+		centre = "No center of mass"
+
 	# Checking if receptor or ligand were somehow removed
 	if not recname in cmd.get_names(selection='(all)'):
 		tkMessageBox.showinfo("Warning", "Selected receptor doesn't exist anymore :c")
@@ -258,6 +257,7 @@ def run_dock(recname, ligname):
 	text.grid(row=0, column=0)
 	text.insert('1.0', "Started docking\nReceptor is {}\nLigand is {}\n".format(recname, ligname))
 	text.insert('end', "FMFT path is {}\n".format(dirname))
+	text.insert('end', "Center of mass: {}\n".format(centre))
 
 	# Creating a temporary directory
 	tmpdir = tempfile.mkdtemp()
@@ -356,7 +356,8 @@ def settings():
 	fmftpath_entry.bind('<Return>', run_dock)
 
 	variants = ['only ligand', 'only receptor', 'ligand and receptor', 'no preprocess']
-	prepr_label = tk.Label(sett, text = "Make preprocess for").grid(column=0, row=3)
+	prepr_label = tk.Label(sett, text = "Make preprocess for")
+	prepr_label.grid(column=0, row=3)
 	prepr_com = ttk.Combobox(sett, values = variants, state='readonly')
 	prepr_com.grid(column=0, row=4)
 	prepr_com.set(str(pymol.plugins.pref_get("PREPROCESS", d='ligand and receptor')))
@@ -427,7 +428,7 @@ def mytkdialog(parent):
 		tkMessageBox.showinfo("Warning", "Couldn't find {your_fmft_path}/install-local/fmft_data/")
 		return
 
-	selections = cmd.get_names(selection='(all)')
+	selections = cmd.get_names('all')
 
 	comboboxRec = ttk.Combobox(root, values=selections, height=3, state='readonly')
 	comboboxRec.set(u"Receptor")
@@ -437,15 +438,8 @@ def mytkdialog(parent):
 	comboboxLig.set(u"Ligand")
 	comboboxLig.grid(column=1, row=0)
 
-	buttonUpd = tk.Button(root, text='Update list', height=1, command=lambda: update_selection(comboboxRec, comboboxLig));
-	buttonUpd.grid(column=2, row=0);
-
-	buttonDock = tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14',
-							command=lambda: mem_check(comboboxRec.get(), comboboxLig.get()))
-	buttonDock.grid(column=2, row=3)
-
-	buttonSet = tk.Button(root, text='Settings', height=1, command=lambda: settings())
-	buttonSet.grid(column=1, row=3)
+	buttonUpd = tk.Button(root, text='Update list', height=1, command=lambda: update_selection(comboboxRec, comboboxLig))
+	buttonUpd.grid(column=2, row=0)
 
 	# Number of results to show in the output
 	nres_label = tk.Label(root, text="Number of results to show in the output")
@@ -457,3 +451,17 @@ def mytkdialog(parent):
 
 	nres_button = tk.Button(root, text='Confirm', command=lambda: save_prep("NUMSHOW", nres_entry.get()))
 	nres_button.grid(row=2, column=1)
+
+	# Where to count center of mass
+	center_label = tk.Label(root, text="Select where is center (optional)")
+	center_label.grid(column=0, row=3)
+	center_combobox = ttk.Combobox(root, values=selections, height=3, state='readonly')
+	center_combobox.set("selection")
+	center_combobox.grid(row=4, column=0)
+
+	buttonDock = tk.Button(root, text='Dock!', width=6, height=1, bg='blue', fg='white', font='arial 14',
+							command=lambda: mem_check(comboboxRec.get(), comboboxLig.get(), center_combobox.get()))
+	buttonDock.grid(column=2, row=5)
+
+	buttonSet = tk.Button(root, text='Settings', height=1, command=lambda: settings())
+	buttonSet.grid(column=1, row=5)
