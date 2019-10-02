@@ -284,7 +284,13 @@ def run_dock(recname, ligname, center_selection):
 	srcfmft = dirname + "/install-local/bin/fmft_dock.py"
 	wei = dirname + "/install-local/bin/prms/fmft_weights_ei.txt"
 	NRES = pymol.plugins.pref_get("NRES", d='1000')
-	fmftcmd = ['python', srcfmft, '--proc_count', PROC_COUNT, '--nres', NRES, lig, rec, wei]
+	if centre != "No center of mass":
+		centre_str = ' '.join([str(x) for x in centre])
+		text.insert('end', "Center of mass: {}\n".format(centre_str))
+		print(centre_str)
+		fmftcmd = ['python', srcfmft, '--proc_count', PROC_COUNT, '--nres', NRES, '-c', centre_str, lig, rec, wei]
+	else:
+		fmftcmd = ['python', srcfmft, '--proc_count', PROC_COUNT, '--nres', NRES, lig, rec, wei]
 	print(fmftcmd)
 	# Run!
 	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=tmpdir)
