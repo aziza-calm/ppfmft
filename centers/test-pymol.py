@@ -8,7 +8,7 @@ import numpy as np
 import random
 import json
 
-DIAM = 20.0 # diameter of the spheres
+DIAM = 25.0 # diameter of the spheres
 
 def calculateCenters(start, end):
     start = np.array(start)
@@ -84,5 +84,8 @@ def findSphereCenters(selection="(all)", linewidth=2.0, r=5.0, g=2.0, b=1.0):
 
 
 
-findSphereCenters()
+# findSphereCenters()
+with open('/home/aziza/Downloads/basa/pymol/ppfmft/centers/centers.json') as json_file:
+    data = json.load(json_file)
+showSphere(np.asarray(data))
 
