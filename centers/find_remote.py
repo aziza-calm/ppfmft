@@ -2,9 +2,10 @@ from Bio.PDB import *
 import json
 import numpy as np
 import time
+import math
 
-DIAM = 25.0 # diameter of the spheres
-molec = '/home/aziza/1oph.pdb'
+DIAM = 55.0 # diameter of the spheres
+molec = '/home/aziza/1gxd.pdb'
 
 def findMostRemote():
     parser = PDBParser()
@@ -45,7 +46,7 @@ def darin(coord, a1, r, dist):
     p = np.asarray(coord)
     # the other surface
     a2 = a1 + r * DIAM / dist
-    if np.dot(p - a1, a2 - a1) > 0 and np.dot(p - a2, a1 - a2):
+    if np.dot(p - a1, a2 - a1) > 0 and np.dot(p - a2, a1 - a2) > 0:
         return True
     return False
 
@@ -57,12 +58,12 @@ def findCenters(dot1, dot2):
     print("Distance is {}".format(dist))
     r = end - start
     numb_centers = dist / DIAM / 0.9
-    anfangs = np.zeros((int(numb_centers), 3), dtype=np.float64)
+    anfangs = np.zeros((math.ceil(numb_centers), 3), dtype=np.float64)
     delta = r * DIAM * 0.9 / dist
     anfangs[0, :] = start - r * 0.1 * DIAM / dist
     i = 1
     print(anfangs.shape)
-    while i < int(numb_centers):
+    while i < math.ceil(numb_centers):
         anfangs[i, :] = anfangs[i - 1, :] + delta
         i += 1
     print("Anfangs {}".format(anfangs))
@@ -71,15 +72,15 @@ def findCenters(dot1, dot2):
     
     parser = PDBParser()
     structure = parser.get_structure('mymol', molec)
-    centers = np.zeros((int(numb_centers), 4), dtype=np.float64)
+    centers = np.zeros((math.ceil(numb_centers), 4), dtype=np.float64)
     # Для каждой области (это уже не сферы)
-    for i in range(int(numb_centers)):
+    for i in range(math.ceil(numb_centers)):
         for atom in structure.get_atoms():
             # проверяем лежит ли атом в этой области
             if darin(atom.get_coord(), anfangs[i], r, dist):
                 centers[i, :3] = centers[i, :3] + atom.get_coord()
                 centers[i, 3] += 1
-    for i in range(int(numb_centers)):
+    for i in range(math.ceil(numb_centers)):
         centers[i, :3] /= centers[i, 3]
     with open('centers.json', 'w') as outfile:
         json.dump(centers[:, :3].tolist(), outfile)
@@ -93,8 +94,6 @@ if __name__=='__main__':
     data['dot2'] = dot2.tolist()
     with open('remote_dots.json', 'w') as outfile:
         json.dump(data, outfile)
-
-    time.sleep(20)
 
     with open('/home/aziza/Downloads/basa/pymol/ppfmft/centers/remote_dots.json') as json_file:
         data = json.load(json_file)
