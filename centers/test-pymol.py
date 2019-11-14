@@ -8,7 +8,7 @@ import numpy as np
 import random
 import json
 
-DIAM = 55.0 # diameter of the spheres
+DIAM = 28.0 # diameter of the spheres
 
 def calculateCenters(start, end):
     start = np.array(start)

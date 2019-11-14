@@ -4,8 +4,8 @@ import numpy as np
 import time
 import math
 
-DIAM = 55.0 # diameter of the spheres
-molec = '/home/aziza/1gxd.pdb'
+DIAM = 25.0 # diameter of the spheres
+molec = '/home/aziza/Downloads/basa/pymol/ppfmft/centers/mol_test/1oph_r.pdb'
 
 def findMostRemote():
     parser = PDBParser()
@@ -50,24 +50,33 @@ def darin(coord, a1, r, dist):
         return True
     return False
 
+def findOptimalK(start, end):
+    k = 0.95
+    dist = np.linalg.norm(start - end)
+    print("Distance is {}".format(dist))
+    r = end - start
+    last_center = np.zeros((1, 3), dtype=np.float64)
+    while np.linalg.norm(end - last_center) > DIAM:
+        numb_centers = dist / DIAM / k
+        anfangs = np.zeros((math.ceil(numb_centers), 3), dtype=np.float64)
+        anfangs[0, :] = start - r * 0.1 * DIAM / dist
+        delta = r * DIAM * k / dist
+        i = 1
+        while i < math.ceil(numb_centers):
+            anfangs[i, :] = anfangs[i - 1, :] + delta
+            i += 1
+        last_center = anfangs[math.ceil(numb_centers) - 1, :] + r * DIAM / dist
+        k *= 1.02
+    print("Anfangs {}".format(anfangs))
+    return anfangs, numb_centers
+
 
 def findCenters(dot1, dot2):
     start = np.array(dot1)
     end = np.array(dot2)
     dist = np.linalg.norm(start - end)
-    print("Distance is {}".format(dist))
     r = end - start
-    numb_centers = dist / DIAM / 0.9
-    anfangs = np.zeros((math.ceil(numb_centers), 3), dtype=np.float64)
-    delta = r * DIAM * 0.9 / dist
-    anfangs[0, :] = start - r * 0.1 * DIAM / dist
-    i = 1
-    print(anfangs.shape)
-    while i < math.ceil(numb_centers):
-        anfangs[i, :] = anfangs[i - 1, :] + delta
-        i += 1
-    print("Anfangs {}".format(anfangs))
-
+    anfangs, numb_centers = findOptimalK(start, end)
     # теперь основная часть, находим центры как среднее всех координат атомов, которые входят в сферу
     
     parser = PDBParser()
