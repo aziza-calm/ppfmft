@@ -2,4 +2,8 @@ sblu.py
 centers/.ipynb_checkpoints/
 centers/commands
 centers/run_dock.py
-centers/*.json
+centers/centers.json
+centers/ligs_in.json
+centers/centers_1oph.json
+centers/remote_dots_1gxd.json
+centers/remote_dots_1oph.json
