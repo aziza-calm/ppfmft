@@ -2,7 +2,7 @@ The main file is `find_remote.py`. It computes most remote CA atoms in molecule,
 
 `find_remote.ipynb` is a copy of `find_remote.py`, but with markdown explanations of different parts (not included yet)
 
-`test_pymol.py` - draws the spheres in pymol. The centers of the spheres are taken from centers.json.
+`draw_sphere.py` - draws the spheres in pymol. The centers of the spheres are taken from centers.json.
 
 `check_models.py` - checks if the model has at least one atom inside the sphere, writes the list of such models in ligs_in.json.
 
