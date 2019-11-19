@@ -9,3 +9,9 @@ centers/remote_dots_1gxd.json
 centers/remote_dots_1oph.json
 centers/centers_1gxd.json
 centers/ligs_in_1gxd_2.json
+centers/Interface.py
+centers/InterfaceBuilder.py
+centers/__pycache__/
+centers/etwas.html
+centers/ligs_sorted.json
+centers/sorted_with_rmsd.json
