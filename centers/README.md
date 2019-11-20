@@ -6,6 +6,10 @@ The main file is `find_remote.py`. It computes most remote CA atoms in molecule,
 
 `check_models.py` - checks if the model has at least one atom inside the sphere, writes the list of such models in ligs_in.json.
 
+`zusammenfassen.py` - creates sorted list of dics with two keys: 'path' and 'energy'. Path is the path to ligand which is inside the sphere, and energy is corresponding energy from ft-file. The list is written in ligs_sorted.json.
+
+`add_rmsd.py` - adds one more key to the above mentioned list: 'rmsd'. And writes updated list in sorted_with_rmsd.json.
+
 All other files are not so important, but still useful.
 
 `divide_mol.py` - divides molecule (structure) in separate chains.
