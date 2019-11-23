@@ -27,17 +27,13 @@ def get_energy(lig):
     num = int(os.path.basename(lig).split('.')[1])
     spl = lig.split('/')
     if int(spl[len(spl) - 2].split('_')[1]) == 2:
-        print("2 == {}".format(int(spl[len(spl) - 2].split('_')[1])))
         return ft_data[centers2[num]['center'], 4]
-    print("1 == {}".format(int(spl[len(spl) - 2].split('_')[1])))
-    print(num)
     return ft_data[centers1[num]['center'], 4]
 
 to_sort = []
 for lig in ligs:
     dic = {}
     dic['path'] = lig
-    print(lig)
     dic['energy'] = get_energy(lig)
     to_sort.append(dic)
 
