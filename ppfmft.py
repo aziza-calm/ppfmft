@@ -106,8 +106,6 @@ def show_result(tmpdir, ligname):
 
 # Preprocessing
 def pdb_prep(mol, out_prefix, tmpdir):
-	#charmm_prm = "~/prms/charmm/charmm_param.prm"
-	#charmm_rtf = "~/prms/charmm/charmm_param.rtf"
 	sblupath = sblu_path()
 	if os.path.basename(sblupath) != 'sblu' or not os.path.isfile(sblupath) or not os.access(sblupath, os.X_OK):
 		print(sblupath)
