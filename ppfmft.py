@@ -288,9 +288,9 @@ def run_dock(recname, ligname, center_selection):
 		centre_str = ' '.join([str(x) for x in centre])
 		text.insert('end', "Center of mass: {}\n".format(centre_str))
 		print(centre_str)
-		fmftcmd = ['python', srcfmft, '--proc_count', PROC_COUNT, '--nres', NRES, '-c', centre_str, lig, rec, wei]
+		fmftcmd = ['python', srcfmft, '--proc_count', PROC_COUNT, '--nres', NRES, '-c', centre_str, rec, lig, wei]
 	else:
-		fmftcmd = ['python', srcfmft, '--proc_count', PROC_COUNT, '--nres', NRES, lig, rec, wei]
+		fmftcmd = ['python', srcfmft, '--proc_count', PROC_COUNT, '--nres', NRES, rec, lig, wei]
 	print(fmftcmd)
 	# Run!
 	p = subprocess.Popen(fmftcmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=tmpdir)
