@@ -111,8 +111,13 @@ def pdb_prep(mol, out_prefix, tmpdir):
 		print(sblupath)
 		tkMessageBox.showinfo("Wrong path", "SBLU path is invalid")
 		return None
-	sblu = [sblupath, 'pdb', 'prep', mol, '--no-minimize', '--out-prefix', out_prefix]
+	fmftpath = pymol.plugins.pref_get("FMFT_PATH")
+	prm = fmftpath + '/install-local/bin/prms/charmm_param.prm'
+	rtf = fmftpath + '/install-local/bin/prms/charmm_param.rtf'
+	print("PRM: " + prm)
+	sblu = [sblupath, 'pdb', 'prep', '--prm', prm, '--rtf', rtf, '--no-minimize', '--out-prefix', out_prefix, mol]
 	print("Preprocessing started")
+	print(sblu)
 	p = subprocess.Popen(sblu, cwd=tmpdir)
 	while p.poll() is None:  # While our process is running
 		time.sleep(0.01)
