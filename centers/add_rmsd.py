@@ -3,9 +3,9 @@ import numpy as np
 import prody
 import json
 
-model = '/home/aziza/Downloads/basa/pymol/ppfmft/centers/mol_test/1gxd_l.pdb'
+model = '/home/aziza/Downloads/basa/pymol/ppfmft/centers/mol_test/1oph_l.pdb'
 
-with open('ligs_sorted.json') as json_file:
+with open('ligs_sorted_1oph.json') as json_file:
     ligs = json.load(json_file)
 
 def rmsd(x, y):
@@ -24,5 +24,5 @@ for i in range(len(ligs)):
 for i in range(len(ligs)):
     print(ligs[i])
 
-with open("sorted_with_rmsd.json", "w") as output_file:
+with open("sorted_with_rmsd_1oph.json", "w") as output_file:
     json.dump(ligs, output_file)

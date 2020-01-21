@@ -7,7 +7,7 @@ import numpy as np
 import random
 import json
 
-DIAM = 90.0 # diameter of the spheres
+DIAM = 80.0 # diameter of the spheres
 
 def showSphere(centers):
     spherelist = []
@@ -21,7 +21,7 @@ def showSphere(centers):
     cmd.load_cgo(spherelist, 'spheres',   1)
 
 
-with open('/home/aziza/Downloads/basa/pymol/ppfmft/centers/centers.json') as json_file:
+with open('/home/aziza/Downloads/basa/pymol/ppfmft/centers/centers_1oph.json') as json_file:
     data = json.load(json_file)
 showSphere(np.asarray(data))
 

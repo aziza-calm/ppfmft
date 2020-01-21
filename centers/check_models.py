@@ -3,9 +3,9 @@ import glob
 import json
 
 DIAM = 90.0 # diameter of the spheres
-path = "/home/aziza/Downloads/basa/pymol/ppfmft/centers/mol_test/1gxd_2/"
+path = "/home/aziza/Downloads/basa/pymol/ppfmft/centers/mol_test/1oph_2/"
 
-with open('/home/aziza/Downloads/basa/pymol/ppfmft/centers/centers.json') as json_file:
+with open('/home/aziza/Downloads/basa/pymol/ppfmft/centers/centers_1oph.json') as json_file:
     data = json.load(json_file)
 center = data[1]
 print("Center: {}".format(center))
@@ -22,5 +22,5 @@ for lig in ligs:
             ligs_in.append(lig)
             break
 print("{} out of {} is inside the sphere".format(len(ligs_in), len(ligs)))
-with open('ligs_in.json', 'w') as outfile:
+with open('ligs_in_1oph_2.json', 'w') as outfile:
     json.dump(ligs_in, outfile)

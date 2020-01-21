@@ -4,8 +4,8 @@ import numpy as np
 import time
 import math
 
-DIAM = 90.0 # diameter of the spheres
-molec = '/home/aziza/Downloads/basa/pymol/ppfmft/centers/mol_test/1gxd_r.pdb'
+DIAM = 80.0 # diameter of the spheres
+molec = '/home/aziza/Downloads/basa/pymol/ppfmft/centers/mol_test/1oph_r.pdb'
 
 def findMostRemote():
     parser = PDBParser()
@@ -81,7 +81,7 @@ def findCenters(dot1, dot2):
                 centers[i, 3] += 1
     for i in range(math.ceil(numb_centers)):
         centers[i, :3] /= centers[i, 3]
-    with open('centers.json', 'w') as outfile:
+    with open('centers_1oph.json', 'w') as outfile:
         json.dump(centers[:, :3].tolist(), outfile)
     print(centers)
 
@@ -91,10 +91,10 @@ if __name__=='__main__':
     data = {}
     data['dot1'] = dot1.tolist()
     data['dot2'] = dot2.tolist()
-    with open('remote_dots_1gxd.json', 'w') as outfile:
+    with open('remote_dots_1oph.json', 'w') as outfile:
         json.dump(data, outfile)
 
-    with open('/home/aziza/Downloads/basa/pymol/ppfmft/centers/remote_dots_1gxd.json') as json_file:
+    with open('/home/aziza/Downloads/basa/pymol/ppfmft/centers/remote_dots_1oph.json') as json_file:
         data = json.load(json_file)
     dot1 = data['dot1']
     dot2 = data['dot2']
