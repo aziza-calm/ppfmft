@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>560</width>
+    <height>400</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QVBoxLayout" name="fmft_verticalLayout">
+      <item>
+       <widget class="QLabel" name="fmft_label">
+        <property name="text">
+         <string>Specify fmft_suite path</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="fmft_horizontalLayout">
+        <item>
+         <widget class="QLineEdit" name="fmftpath_line">
+          <property name="text">
+           <string>/path/to/fmft_suite</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="fmft_browse_button">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="sblu_verticalLayout">
+      <item>
+       <widget class="QLabel" name="sblu_label">
+        <property name="text">
+         <string>Specify sblu path</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="sblu_horizontalLayout">
+        <item>
+         <widget class="QLineEdit" name="sblupath_line">
+          <property name="text">
+           <string>/path/to/sblu</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="sblu_browse_button">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="receptor_checkBox">
+      <property name="text">
+       <string>preprocess receptor</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="ligand_checkBox">
+      <property name="text">
+       <string>preprocess ligand</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="cpu_horizontalLayout">
+      <item>
+       <widget class="QSpinBox" name="cpu_num_spinbox">
+        <property name="value">
+         <number>4</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="cpu_label">
+        <property name="text">
+         <string>number of cpu cores to use</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="nres_horizontalLayout">
+      <item>
+       <widget class="QSpinBox" name="nres_spinbox">
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+        <property name="value">
+         <number>1000</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="nres_label">
+        <property name="text">
+         <string>NRES parameter of fmft_suite</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

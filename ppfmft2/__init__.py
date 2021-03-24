@@ -8,8 +8,10 @@ def run_plugin_gui():
     import sys
     sys.path.append(os.path.dirname(__file__))
     from main_window import MainWindow
+    from settings import Settings
 
     global main_window
 
-    main_window = MainWindow()
+    settings = Settings()
+    main_window = MainWindow(settings)
     main_window.show()

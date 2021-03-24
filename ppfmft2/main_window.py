@@ -4,28 +4,36 @@ import pymol
 import subprocess
 from pymol.Qt.utils import loadUi
 from pymol.Qt import QtWidgets
+import sblu
 
 
-def set_object_list(combobox):
-    objects = pymol.cmd.get_names('objects')
-    combobox.clear()
-    combobox.addItems(objects)
-    combobox.setCurrentIndex(len(objects) - 1)
-    return combobox
+def fmft_path():
+    user_path = os.path.expanduser("~")
+    fmftpath = pymol.plugins.pref_get("FMFT_PATH", d="/home/aziza/Documents/sciense/fmft_suite")
+    return fmftpath
 
 
 class MainWindow(QtWidgets.QDialog):
-    def __init__(self):
+    def __init__(self, settings):
         super(MainWindow, self).__init__()
-        uifile = os.path.join(os.path.dirname(__file__), 'dock_window.ui')
-        form = loadUi(uifile, self)
-        self.ligand_combobox = set_object_list(self.ligand_combobox)
-        self.receptor_combobox = set_object_list(self.receptor_combobox)
+        uifile = os.path.join(os.path.dirname(__file__), 'main_window.ui')
+        loadUi(uifile, self)
+        self.ligand_combobox = self.set_object_list(self.ligand_combobox)
+        self.receptor_combobox = self.set_object_list(self.receptor_combobox)
+        self.settings = settings
         self.button_dock.clicked.connect(self.dock_pressed)
         self.settings_button.clicked.connect(self.settings_pressed)
 
     def dock_pressed(self):
-        print("Dock button pressed")
+        # Check if translation matrices are precomputed
+        if os.path.exists(self.settings.fmftpath + '/install-local/fmft_data/'):
+            if not os.listdir(self.settings.fmftpath + '/install-local/fmft_data/'):
+                self.dialog("Couldn't find the appropriate translation matrix file")
+                return
+        else:
+            self.dialog("Couldn't find {your_fmft_path}/install-local/fmft_data/")
+            return
+
         recname = self.receptor_combobox.currentText()
         ligname = self.ligand_combobox.currentText()
         # Creating a temporary directory
@@ -54,4 +62,21 @@ class MainWindow(QtWidgets.QDialog):
             print("FMFT failed")
 
     def settings_pressed(self):
-        print("Settings button pressed")
+        self.settings.show()
+
+    @staticmethod
+    def set_object_list(combobox):
+        objects = pymol.cmd.get_names('objects')
+        combobox.clear()
+        combobox.addItems(objects)
+        combobox.setCurrentIndex(len(objects) - 1)
+        return combobox
+
+    @staticmethod
+    def dialog(message):
+        dialog = QtWidgets.QMessageBox()
+        dialog.setIcon(QtWidgets.QMessageBox.Question)
+        dialog.setWindowTitle("Warning")
+        dialog.setText(message)
+        dialog.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        return dialog.exec_() == QtWidgets.QMessageBox.Ok
