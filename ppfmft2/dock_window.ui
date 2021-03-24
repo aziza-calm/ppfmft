@@ -43,32 +43,6 @@
     </property>
    </item>
   </widget>
-  <widget class="QCheckBox" name="settings_checkbox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>80</y>
-     <width>131</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>default settings</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="folder_checkbox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>110</y>
-     <width>151</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>default output folder</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="button_dock">
    <property name="geometry">
     <rect>
@@ -80,6 +54,19 @@
    </property>
    <property name="text">
     <string>Dock!</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="settings_button">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>80</y>
+     <width>88</width>
+     <height>34</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Settings</string>
    </property>
   </widget>
  </widget>

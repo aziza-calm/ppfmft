@@ -22,6 +22,7 @@ class MainWindow(QtWidgets.QDialog):
         self.ligand_combobox = set_object_list(self.ligand_combobox)
         self.receptor_combobox = set_object_list(self.receptor_combobox)
         self.button_dock.clicked.connect(self.dock_pressed)
+        self.settings_button.clicked.connect(self.settings_pressed)
 
     def dock_pressed(self):
         print("Dock button pressed")
@@ -49,3 +50,8 @@ class MainWindow(QtWidgets.QDialog):
         if rc is not None:
             print("The process seems to finish")
             print("Maybe you can find something in " + tmpdir)
+        else:
+            print("FMFT failed")
+
+    def settings_pressed(self):
+        print("Settings button pressed")
