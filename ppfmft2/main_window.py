@@ -3,13 +3,15 @@ import tempfile
 import pymol
 import subprocess
 from pymol.Qt.utils import loadUi
-from pymol.Qt import QtWidgets
+from qt_wrapper import QtWidgets, QtGui, WITH_PYMOL
 import sblu
 
 
 def fmft_path():
-    user_path = os.path.expanduser("~")
-    fmftpath = pymol.plugins.pref_get("FMFT_PATH", d="/home/aziza/Documents/sciense/fmft_suite")
+    if WITH_PYMOL:
+        user_path = os.path.expanduser("~")
+        fmftpath = "/home/aziza/Documents/sciense/fmft_suite"
+        # fmftpath = pymol.plugins.pref_get("FMFT_PATH", d="/home/aziza/Documents/sciense/fmft_suite")
     return fmftpath
 
 
@@ -66,10 +68,11 @@ class MainWindow(QtWidgets.QDialog):
 
     @staticmethod
     def set_object_list(combobox):
-        objects = pymol.cmd.get_names('objects')
-        combobox.clear()
-        combobox.addItems(objects)
-        combobox.setCurrentIndex(len(objects) - 1)
+        if WITH_PYMOL:
+            objects = pymol.cmd.get_names('objects')
+            combobox.clear()
+            combobox.addItems(objects)
+            combobox.setCurrentIndex(len(objects) - 1)
         return combobox
 
     @staticmethod
